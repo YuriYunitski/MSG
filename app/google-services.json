@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "94799221736",
+    "project_id": "mcgmessenger-26c67",
+    "storage_bucket": "mcgmessenger-26c67.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:94799221736:android:d1b32b824879cda98b8a5d",
+        "android_client_info": {
+          "package_name": "com.yunitski.msg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "94799221736-ebva617lo30hc4cmtiqmuj3efhutmhp8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yunitski.msg",
+            "certificate_hash": "ca168745873e506c77f66506b59bb34071863c19"
+          }
+        },
+        {
+          "client_id": "94799221736-ilhiod1gih11hi8c7rpbfp0r0iqe52pe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUXkZnMrcDx9PzkX9Ci0WIL2NIm3qd3vE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "94799221736-ilhiod1gih11hi8c7rpbfp0r0iqe52pe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
