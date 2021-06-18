@@ -1,10 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.UserListActivity">
+
+
 
     <LinearLayout
         android:id="@+id/linearLayout2"
@@ -31,51 +34,11 @@
 
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/mainActivityListView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:transcriptMode="alwaysScroll"
-        app:layout_constraintBottom_toTopOf="@+id/messageEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/userListRecyclerView"
+        android:padding="4dp"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
-    <ImageButton
-        android:id="@+id/addContentImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/messageEditText"
-        app:srcCompat="@drawable/ic_baseline_control_point_24"
-        tools:ignore="VectorDrawableCompat" />
-
-    <ImageButton
-        android:id="@+id/sendMessageImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/white"
-        app:layout_constraintTop_toTopOf="@+id/messageEditText"
-        app:srcCompat="@drawable/ic_baseline_send_24"
-        tools:ignore="VectorDrawableCompat" />
-
-    <EditText
-        android:id="@+id/messageEditText"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="#818181"
-        android:ems="10"
-        android:hint="Введите сообщение"
-        android:inputType="textPersonName"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/sendMessageImageButton"
-        app:layout_constraintStart_toEndOf="@+id/addContentImageButton" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

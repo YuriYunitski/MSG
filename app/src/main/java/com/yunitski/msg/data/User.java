@@ -4,14 +4,16 @@ public class User {
     private String name;
     private String email;
     private String id;
+    private int avatarMockupResource;
 
     public User() {
     }
 
-    public User(String name, String email, String id) {
+    public User(String name, String email, String id, int avatarMockupResource) {
         this.name = name;
         this.email = email;
         this.id = id;
+        this.avatarMockupResource = avatarMockupResource;
     }
 
     public String getName() {
@@ -36,5 +38,13 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public int getAvatarMockupResource() {
+        return avatarMockupResource;
+    }
+
+    public void setAvatarMockupResource(int avatarMockupResource) {
+        this.avatarMockupResource = avatarMockupResource;
     }
 }

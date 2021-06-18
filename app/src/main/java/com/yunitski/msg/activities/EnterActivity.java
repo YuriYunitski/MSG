@@ -4,13 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,13 +19,14 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.yunitski.msg.R;
 import com.yunitski.msg.data.User;
 
-public class EnterActivity extends AppCompatActivity implements View.OnClickListener {
+public class
+
+EnterActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth auth;
     private EditText emailEditText, passwordEditText, confirmPasswordEditText, nameEditText;
@@ -66,7 +64,7 @@ public class EnterActivity extends AppCompatActivity implements View.OnClickList
         isLogInModeActive = false;
         isEnterSuccess = false;
         if (auth.getCurrentUser() != null){
-            startActivity(new Intent(EnterActivity.this, MainActivity.class));
+            startActivity(new Intent(EnterActivity.this, UserListActivity.class));
         }
     }
 
@@ -109,7 +107,7 @@ public class EnterActivity extends AppCompatActivity implements View.OnClickList
                                     Log.d(TAG, "signInWithEmail:success");
                                     FirebaseUser user = auth.getCurrentUser();
                                     //updateUI(user);
-                                    Intent intent = new Intent(EnterActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(EnterActivity.this, UserListActivity.class);
                                     intent.putExtra("userName", nameEditText.getText().toString().trim());
                                     startActivity(intent);
                                 } else {
@@ -141,7 +139,7 @@ public class EnterActivity extends AppCompatActivity implements View.OnClickList
                                     FirebaseUser user = auth.getCurrentUser();
                                     createUser(user);
                                     //updateUI(user);
-                                    Intent intent = new Intent(EnterActivity.this, MainActivity.class);
+                                    Intent intent = new Intent(EnterActivity.this, UserListActivity.class);
                                     intent.putExtra("userName", nameEditText.getText().toString().trim());
                                     startActivity(intent);
                                 } else {

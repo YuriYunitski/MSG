@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -17,10 +18,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -40,9 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
 
-    private Toolbar toolbar;
     private ListView messageListView;
     private MSGAdapter adapter;
     private ImageButton sendMessageImageButton, addContentImageButton;
@@ -57,20 +61,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseStorage storage;
     private StorageReference chatImagesStorageReference;
 
+    private Toolbar toolbar;
+
+    private String recipientUserId;
+
+    private FirebaseAuth auth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chat);
         toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+
+        auth = FirebaseAuth.getInstance();
 
         database = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -80,10 +86,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         chatImagesStorageReference = storage.getReference().child("chat_images");
 
 
-
         Intent intent = getIntent();
         if (intent != null){
             userName = intent.getStringExtra("userName");
+            recipientUserId = intent.getStringExtra("recipientUserId");
         } else {
             userName = "Default User";
         }
@@ -95,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         List<MSGmessage> gmessages = new ArrayList<>();
         adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
         messageListView.setAdapter(adapter);
+
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -148,8 +155,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         messagesChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                MSGmessage gmessage = snapshot.getValue(MSGmessage.class);
-                adapter.add(gmessage);
+                MSGmessage message = snapshot.getValue(MSGmessage.class);
+                if (message.getSender().equals(auth.getCurrentUser().getUid())
+                        && message.getRecipient().equals(recipientUserId)) {
+                    message.setMine(true);
+                    message.setName(userName);
+                    adapter.add(message);
+                } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
+                        && message.getSender().equals(recipientUserId)) {
+                    message.setMine(false);
+                    adapter.add(message);
+                }
+                messageListView.setStackFromBottom(true);
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -173,6 +191,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
         messagesDatabaseReference.addChildEventListener(messagesChildEventListener);
+//        messageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//
+//                if (totalItemCount > 0)
+//                {
+//                    int lastInScreen = firstVisibleItem + visibleItemCount;
+//                    if(lastInScreen == totalItemCount)
+//                    {
+//
+//                        //Notify the adapter about the data set change.
+//                        adapter.notifyDataSetChanged();
+//                    }
+//                }
+//            }
+//        });
     }
 
     @Override
@@ -186,10 +225,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MSGmessage gmessage = new MSGmessage();
             gmessage.setText(messageEditText.getText().toString());
             gmessage.setName(userName);
+            gmessage.setSender(auth.getCurrentUser().getUid());
+            gmessage.setRecipient(recipientUserId);
             gmessage.setImageUrl(null);
 
             messagesDatabaseReference.push().setValue(gmessage);
             messageEditText.setText("");
+
         } else if (v.getId() == R.id.addContentImageButton){
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
@@ -198,30 +240,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.sign_out) {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, EnterActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
             Uri selectedImageUri = data.getData();
-            StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
+            final StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedImageUri);
+
+            uploadTask = imageReference.putFile(selectedImageUri);
+
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        MSGmessage gmessage = new MSGmessage();
+                        gmessage.setImageUrl(downloadUri.toString());
+                        gmessage.setName(userName);
+                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setRecipient(recipientUserId);
+                        messagesDatabaseReference.push().setValue(gmessage);
+                    } else {
+                        // Handle failures
+                        // ...
+                    }
+                }
+            });
         }
+//        messageListView.setStackFromBottom(true);
+//        adapter.notifyDataSetChanged();
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                break;
+        }
+        return true;
     }
 }
