@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -101,6 +102,8 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
         List<MSGmessage> gmessages = new ArrayList<>();
         adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
         messageListView.setAdapter(adapter);
+                messageListView.setStackFromBottom(true);
+        adapter.notifyDataSetChanged();
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -166,8 +169,6 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
                     message.setMine(false);
                     adapter.add(message);
                 }
-                messageListView.setStackFromBottom(true);
-                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -214,6 +215,7 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
 //        });
     }
 
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
@@ -231,6 +233,7 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
 
             messagesDatabaseReference.push().setValue(gmessage);
             messageEditText.setText("");
+            messageEditText.requestFocus();
 
         } else if (v.getId() == R.id.addContentImageButton){
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -245,6 +248,8 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
+            hideKeyboard();
+            adapter.notifyDataSetChanged();
             Uri selectedImageUri = data.getData();
             final StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedImageUri);
@@ -292,5 +297,10 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
                 break;
         }
         return true;
+    }
+
+    private void hideKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(messageEditText.getWindowToken(), 0);
     }
 }
