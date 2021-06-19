@@ -9,21 +9,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
-        android:background="@drawable/my_message_bubble"
+        android:background="@drawable/message_in"
         android:paddingBottom="10dp">
 
         <ImageView
-            android:layout_width="@dimen/_150sdp"
-            android:layout_height="@dimen/_150sdp"
-            android:id="@+id/photoImageView"/>
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="wrap_content"
+            android:id="@+id/photoImageView"
+            android:paddingBottom="10dp"/>
 
         <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/messageTextView"
-        android:maxWidth="100dp"
-        android:padding="5dp"
-            android:textColor="@color/black"/>
+            android:id="@+id/messageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12sdp"/>
 
     </LinearLayout>
 

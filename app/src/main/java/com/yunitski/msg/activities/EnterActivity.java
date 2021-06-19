@@ -65,6 +65,7 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
         isEnterSuccess = false;
         if (auth.getCurrentUser() != null){
             startActivity(new Intent(EnterActivity.this, UserListActivity.class));
+            EnterActivity.this.finish();
         }
     }
 
@@ -110,6 +111,7 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
                                     Intent intent = new Intent(EnterActivity.this, UserListActivity.class);
                                     intent.putExtra("userName", nameEditText.getText().toString().trim());
                                     startActivity(intent);
+                                    EnterActivity.this.finish();
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -142,6 +144,7 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
                                     Intent intent = new Intent(EnterActivity.this, UserListActivity.class);
                                     intent.putExtra("userName", nameEditText.getText().toString().trim());
                                     startActivity(intent);
+                                    EnterActivity.this.finish();
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "createUserWithEmail:failure", task.getException());

@@ -39,7 +39,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:divider="@null"
@@ -79,7 +78,7 @@
         android:backgroundTint="#818181"
         android:ems="10"
         android:hint="Введите сообщение"
-        android:inputType="textPersonName"
+        android:inputType="textMultiLine"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sendMessageImageButton"
         app:layout_constraintStart_toEndOf="@+id/addContentImageButton" />
