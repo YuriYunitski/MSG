@@ -137,10 +137,8 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     private void goToChat(int position) {
         Intent intent = new Intent(UserListActivity.this,
                 ChatActivity.class);
-        intent.putExtra("recipientUserId",
-                userArrayList.get(position).getId());
-        intent.putExtra("recipientUserName",
-                userArrayList.get(position).getName());
+        intent.putExtra("recipientUserId", userArrayList.get(position).getId());
+        intent.putExtra("recipientUserName", userArrayList.get(position).getName());
         intent.putExtra("userName", userName);
         startActivity(intent);
     }

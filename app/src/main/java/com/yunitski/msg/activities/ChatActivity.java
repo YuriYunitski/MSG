@@ -73,6 +73,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     List<MSGmessage> gmessages;
     LinearLayout chatItemLinearLayout;
 
+    private String recipientUserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,9 +98,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (intent != null){
             userName = intent.getStringExtra("userName");
             recipientUserId = intent.getStringExtra("recipientUserId");
-        } else {
-            userName = "Default User";
+            recipientUserName = intent.getStringExtra("recipientUserName");
         }
+        setTitle(recipientUserName);
 
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);

@@ -2,6 +2,7 @@ package com.yunitski.msg.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -18,37 +19,80 @@ import com.yunitski.msg.data.MSGmessage;
 import java.util.List;
 
 public class MSGAdapter extends ArrayAdapter<MSGmessage> {
-    public MSGAdapter(@NonNull Context context, int resource, List<MSGmessage> messages) {
+
+    private List<MSGmessage> gmessages;
+
+    private Activity activity;
+
+    public MSGAdapter(@NonNull Activity context, int resource, List<MSGmessage> messages) {
         super(context, resource, messages);
+        this.gmessages = messages;
+        this.activity = context;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        if (convertView == null){
-            convertView = ((Activity) getContext()).getLayoutInflater().inflate(R.layout.message_item, parent, false);
-        }
+        ViewHolder viewHolder;
+        LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        ImageView photoImageView = convertView.findViewById(R.id.photoImageView);
-        TextView textTextView = convertView.findViewById(R.id.textTextView);
-        TextView nameTextView = convertView.findViewById(R.id.nameTextView);
+        MSGmessage msGmessage = getItem(position);
+        int layoutResource = 0;
+        int viewType = getItemViewType(position);
 
-        MSGmessage gmessage = getItem(position);
-
-        boolean isText = gmessage.getImageUrl() == null;
-
-        if (isText){
-            textTextView.setVisibility(View.VISIBLE);
-            photoImageView.setVisibility(View.GONE);
-            textTextView.setText(gmessage.getText());
+        if (viewType == 0){
+            layoutResource = R.layout.your_message_item;
         } else {
-            textTextView.setVisibility(View.GONE);
-            photoImageView.setVisibility(View.VISIBLE);
-            Glide.with(photoImageView.getContext()).load(gmessage.getImageUrl()).into(photoImageView);
+            layoutResource = R.layout.my_message_item;
         }
-        nameTextView.setText(gmessage.getName());
 
+        if (convertView != null){
+            viewHolder = (ViewHolder) convertView.getTag();
+        } else {
+            convertView = layoutInflater.inflate(layoutResource, parent, false);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        }
+        boolean isText = msGmessage.getImageUrl() == null;
+        if (isText){
+            viewHolder.messageTextView.setVisibility(View.VISIBLE);
+            viewHolder.photoImageView.setVisibility(View.GONE);
+            viewHolder.messageTextView.setText(msGmessage.getText());
+        } else {
+
+            viewHolder.messageTextView.setVisibility(View.GONE);
+            viewHolder.photoImageView.setVisibility(View.VISIBLE);
+            Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getImageUrl()).into(viewHolder.photoImageView);
+        }
         return convertView;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        int flag;
+        MSGmessage msGmessage = gmessages.get(position);
+        if (msGmessage.isMine()){
+            flag = 0;
+        } else {
+            flag = 1;
+        }
+
+        return flag;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    private class ViewHolder{
+        private TextView messageTextView;
+        private ImageView photoImageView;
+
+        public ViewHolder(View view){
+            photoImageView = view.findViewById(R.id.photoImageView);
+            messageTextView = view.findViewById(R.id.messageTextView);
+        }
     }
 }
