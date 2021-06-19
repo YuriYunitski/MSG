@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,6 +23,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.google.android.gms.tasks.Continuation;
@@ -46,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ChatActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ListView messageListView;
     private MSGAdapter adapter;
@@ -67,6 +69,9 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
     private String recipientUserId;
 
     private FirebaseAuth auth;
+
+    List<MSGmessage> gmessages;
+    LinearLayout chatItemLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,11 +104,11 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
         addContentImageButton = findViewById(R.id.addContentImageButton);
         messageEditText = findViewById(R.id.messageEditText);
-        List<MSGmessage> gmessages = new ArrayList<>();
-        adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
-        messageListView.setAdapter(adapter);
-                messageListView.setStackFromBottom(true);
-        adapter.notifyDataSetChanged();
+        chatItemLinearLayout = findViewById(R.id.chatItemLinearLayout);
+        updateUI();
+
+//        messageListView.setStackFromBottom(true);
+//        adapter.notifyDataSetChanged();
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -215,11 +220,15 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
 //        });
     }
 
+    private void updateUI(){
+        gmessages = new ArrayList<>();
+        adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
+        messageListView.setAdapter(adapter);
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
+        messageListView.setStackFromBottom(true);
+        adapter.notifyDataSetChanged();
     }
+
 
     @Override
     public void onClick(View v) {
@@ -248,8 +257,6 @@ public class ChatActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
-            hideKeyboard();
-            adapter.notifyDataSetChanged();
             Uri selectedImageUri = data.getData();
             final StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedImageUri);
