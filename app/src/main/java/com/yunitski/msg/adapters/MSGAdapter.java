@@ -23,11 +23,20 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
     private List<MSGmessage> gmessages;
 
     private Activity activity;
+    private OnPhotoClickListener listener;
 
     public MSGAdapter(@NonNull Activity context, int resource, List<MSGmessage> messages) {
         super(context, resource, messages);
         this.gmessages = messages;
         this.activity = context;
+    }
+
+    public interface OnPhotoClickListener{
+        void onUserClick(int position);
+    }
+
+    public void setOnPhotoClickListener(OnPhotoClickListener listener){
+        this.listener = listener;
     }
 
     @NonNull
@@ -66,6 +75,13 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             viewHolder.photoImageView.setVisibility(View.VISIBLE);
             Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getImageUrl()).into(viewHolder.photoImageView);
             viewHolder.messageTimeTextView.setText(msGmessage.getTime());
+            viewHolder.photoImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
+                }
+            });
         }
         return convertView;
     }

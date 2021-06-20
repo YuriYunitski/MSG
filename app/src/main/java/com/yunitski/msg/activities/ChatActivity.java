@@ -21,21 +21,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -231,13 +235,23 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         messageListView.setStackFromBottom(true);
         adapter.notifyDataSetChanged();
+        adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
+            @Override
+            public void onUserClick(int position) {
+                Toast.makeText(getApplicationContext(), "oi " + position, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        return "" + hour + ":" + minute;
+        String m = "" + minute;
+        if (minute < 10){
+            m = "0" + minute;
+        }
+        return "" + hour + ":" + m;
     }
 
 
