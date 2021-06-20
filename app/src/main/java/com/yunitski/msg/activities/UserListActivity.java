@@ -162,6 +162,7 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         if (item.getItemId() == R.id.sign_out) {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(UserListActivity.this, EnterActivity.class));
+            UserListActivity.this.finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
