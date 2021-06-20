@@ -14,16 +14,33 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/user_image" />
-
-        <TextView
-            android:id="@+id/userNameTextView"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="User Name"
-            android:textSize="15sp"
-            android:textStyle="bold"
-            android:layout_gravity="center"
-            android:layout_marginStart="20dp"/>
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/userNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="User Name"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:layout_gravity="top"
+                android:layout_marginStart="20dp"/>
+
+            <TextView
+                android:id="@+id/userLastMessageTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LastMessage"
+                android:layout_marginStart="20dp"
+                android:maxLength="35"/>
+
+
+        </LinearLayout>
+
 
 
     </LinearLayout>

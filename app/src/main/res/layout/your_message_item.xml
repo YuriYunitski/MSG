@@ -22,9 +22,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/messageTextView"
-            android:paddingBottom="10dp"
             android:textColor="@color/black"
             android:textSize="@dimen/_12sdp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/messageTimeTextView"
+            android:textColor="@color/black"
+            android:layout_gravity="end"
+            android:textSize="@dimen/_8sdp"
+            android:paddingBottom="5dp"/>
 
     </LinearLayout>
 

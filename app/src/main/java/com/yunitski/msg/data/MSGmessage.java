@@ -7,18 +7,19 @@ public class MSGmessage {
     private String sender;
     private String recipient;
     private boolean isMine;
+    private String time;
 
     public MSGmessage() {
     }
 
-
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
         this.sender = sender;
         this.recipient = recipient;
         this.isMine = isMine;
+        this.time = time;
     }
 
     public String getText() {
@@ -67,5 +68,13 @@ public class MSGmessage {
 
     public void setMine(boolean mine) {
         isMine = mine;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

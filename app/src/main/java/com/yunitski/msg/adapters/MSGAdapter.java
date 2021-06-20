@@ -59,11 +59,13 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             viewHolder.messageTextView.setVisibility(View.VISIBLE);
             viewHolder.photoImageView.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(msGmessage.getText());
+            viewHolder.messageTimeTextView.setText(msGmessage.getTime());
         } else {
 
             viewHolder.messageTextView.setVisibility(View.GONE);
             viewHolder.photoImageView.setVisibility(View.VISIBLE);
             Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getImageUrl()).into(viewHolder.photoImageView);
+            viewHolder.messageTimeTextView.setText(msGmessage.getTime());
         }
         return convertView;
     }
@@ -87,12 +89,13 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
     }
 
     private class ViewHolder{
-        private TextView messageTextView;
+        private TextView messageTextView, messageTimeTextView;
         private ImageView photoImageView;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
             messageTextView = view.findViewById(R.id.messageTextView);
+            messageTimeTextView = view.findViewById(R.id.messageTimeTextView);
         }
     }
 }

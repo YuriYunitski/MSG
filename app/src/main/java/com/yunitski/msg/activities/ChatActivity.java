@@ -45,6 +45,8 @@ import com.yunitski.msg.data.MSGmessage;
 import com.yunitski.msg.data.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Objects;
 
@@ -231,6 +233,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adapter.notifyDataSetChanged();
     }
 
+    private String currentDate(){
+        Calendar calendar = new GregorianCalendar();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        return "" + hour + ":" + minute;
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -241,7 +250,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             gmessage.setSender(auth.getCurrentUser().getUid());
             gmessage.setRecipient(recipientUserId);
             gmessage.setImageUrl(null);
-
+            gmessage.setTime(currentDate());
             messagesDatabaseReference.push().setValue(gmessage);
             messageEditText.setText("");
             messageEditText.requestFocus();
@@ -285,6 +294,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);
+                        gmessage.setTime(currentDate());
                         messagesDatabaseReference.push().setValue(gmessage);
                     } else {
                         // Handle failures

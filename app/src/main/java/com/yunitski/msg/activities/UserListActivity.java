@@ -23,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.UserAdapter;
 import com.yunitski.msg.data.User;
