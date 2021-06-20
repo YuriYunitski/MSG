@@ -46,7 +46,10 @@
         app:layout_constraintBottom_toTopOf="@+id/messageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" >
+
+
+    </ListView>
 
     <ImageButton
         android:id="@+id/addContentImageButton"
@@ -82,4 +85,16 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sendMessageImageButton"
         app:layout_constraintStart_toEndOf="@+id/addContentImageButton" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/white"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@+id/mainActivityListView"
+        app:layout_constraintEnd_toEndOf="@+id/mainActivityListView"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24"
+        tools:ignore="VectorDrawableCompat" />
 </androidx.constraintlayout.widget.ConstraintLayout>

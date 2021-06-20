@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:transcriptMode="alwaysScroll"
     tools:context=".activities.EnterActivity">
 
     <TextView
@@ -23,11 +24,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Регистрация"
         android:clickable="true"
         android:padding="10dp"
-        android:textSize="@dimen/_12sdp"
+        android:text="Регистрация"
         android:textColor="@color/black"
+        android:textSize="@dimen/_12sdp"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -36,11 +37,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Вход"
         android:clickable="true"
         android:padding="10dp"
-        android:textSize="@dimen/_12sdp"
+        android:text="Вход"
         android:textColor="@color/black"
+        android:textSize="@dimen/_12sdp"
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -51,13 +52,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:backgroundTint="#818181"
         android:ems="10"
-        android:inputType="textEmailAddress"
         android:hint="Email"
+        android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/registrationTextView"
-        android:backgroundTint="#818181"/>
+        app:layout_constraintTop_toBottomOf="@+id/registrationTextView" />
 
     <EditText
         android:id="@+id/passwordEditText"
@@ -66,13 +67,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:backgroundTint="#818181"
         android:ems="10"
-        android:inputType="textPassword"
         android:hint="Пароль"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailEditText"
-        android:backgroundTint="#818181"/>
+        app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
 
     <EditText
         android:id="@+id/confirmPasswordEditText"
@@ -81,13 +82,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:backgroundTint="#818181"
         android:ems="10"
-        android:inputType="textPassword"
         android:hint="Подтвердите пароль"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/passwordEditText"
-        android:backgroundTint="#818181" />
+        app:layout_constraintTop_toBottomOf="@+id/passwordEditText" />
 
     <EditText
         android:id="@+id/nameEditText"
@@ -96,13 +97,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:backgroundTint="#818181"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Имя"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmPasswordEditText"
-        android:backgroundTint="#818181" />
+        app:layout_constraintTop_toBottomOf="@+id/confirmPasswordEditText" />
 
     <Button
         android:id="@+id/applyButton"
@@ -111,8 +112,8 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:text="Регистрация"
         android:backgroundTint="@color/black"
+        android:text="Регистрация"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameEditText" />

@@ -9,17 +9,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MSG.NoActionBar">
-        <activity android:name=".activities.UserListActivity"></activity>
-        <activity android:name=".activities.EnterActivity">
+        <activity android:name=".activities.PhotoActivity"></activity>
+        <activity android:name=".activities.UserListActivity" />
+        <activity android:name=".activities.EnterActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.ChatActivity">
-
-        </activity>
+        <activity android:name=".activities.ChatActivity"></activity>
     </application>
 
 </manifest>

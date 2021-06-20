@@ -114,4 +114,9 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             messageTimeTextView = view.findViewById(R.id.messageTimeTextView);
         }
     }
+
+    @Override
+    public int getCount() {
+        return gmessages.size();
+    }
 }

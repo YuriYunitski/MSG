@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -80,6 +81,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout chatItemLinearLayout;
 
     private String recipientUserName;
+    private ArrayList<MSGmessage> msGmessageArrayList;
+
+    FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,12 +112,31 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }
         setTitle(recipientUserName);
 
+        msGmessageArrayList = new ArrayList<>();
+
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
         addContentImageButton = findViewById(R.id.addContentImageButton);
         messageEditText = findViewById(R.id.messageEditText);
         chatItemLinearLayout = findViewById(R.id.chatItemLinearLayout);
-        updateUI();
+        floatingActionButton = findViewById(R.id.fabBottom);
+        floatingActionButton.setOnClickListener(this);
+
+        gmessages = new ArrayList<>();
+        adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
+        messageListView.setAdapter(adapter);
+
+        messageListView.setStackFromBottom(true);
+        adapter.notifyDataSetChanged();
+        adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
+            @Override
+            public void onUserClick(int position) {
+//                Toast.makeText(getApplicationContext(), "oi " + position, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(ChatActivity.this, PhotoActivity.class);
+                intent.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
+                startActivity(intent);
+            }
+        });
 
 //        messageListView.setStackFromBottom(true);
 //        adapter.notifyDataSetChanged();
@@ -176,10 +199,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         && message.getRecipient().equals(recipientUserId)) {
                     message.setMine(true);
                     message.setName(userName);
+                    msGmessageArrayList.add(message);
                     adapter.add(message);
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId)) {
                     message.setMine(false);
+                    msGmessageArrayList.add(message);
                     adapter.add(message);
                 }
             }
@@ -226,22 +251,42 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //                }
 //            }
 //        });
-    }
+        messageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
-    private void updateUI(){
-        gmessages = new ArrayList<>();
-        adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
-        messageListView.setAdapter(adapter);
-
-        messageListView.setStackFromBottom(true);
-        adapter.notifyDataSetChanged();
-        adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
+            private int lastFirstVisibleItem;
             @Override
-            public void onUserClick(int position) {
-                Toast.makeText(getApplicationContext(), "oi " + position, Toast.LENGTH_SHORT).show();
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                if (view.getId() == messageListView.getId()){
+                    final int currentFirstVisibleItem = messageListView.getLastVisiblePosition();
+
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem < (totalItemCount - 13)) {
+
+                    floatingActionButton.setVisibility(View.VISIBLE);
+                }else {
+                    floatingActionButton.setVisibility(View.INVISIBLE);
+                }
+//                if(lastFirstVisibleItem<firstVisibleItem){
+//                    Toast.makeText(getApplicationContext(), " oi" + msGmessageArrayList.size() + "\n" + adapter.getCount(), Toast.LENGTH_SHORT).show();
+//
+//                    if (lastFirstVisibleItem < msGmessageArrayList.size() - 5) {
+//
+//                    floatingActionButton.setVisibility(View.VISIBLE);
+//
+//                                    }else {
+//                    floatingActionButton.setVisibility(View.INVISIBLE);
+//                }
+//                }
+//                lastFirstVisibleItem=firstVisibleItem;
             }
         });
     }
+
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();
@@ -274,6 +319,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             intent.setType("image/*");
             intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
             startActivityForResult(Intent.createChooser(intent, "Choose an image"), RC_IMAGE_PICKER);
+        } else if (v.getId() == R.id.fabBottom){
+            messageListView.setSelection(adapter.getCount() - 1);
         }
     }
 
@@ -294,7 +341,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-
                     // Continue with the task to get the download URL
                     return imageReference.getDownloadUrl();
                 }
@@ -310,6 +356,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         gmessage.setRecipient(recipientUserId);
                         gmessage.setTime(currentDate());
                         messagesDatabaseReference.push().setValue(gmessage);
+                        messageListView.setSelection(adapter.getCount() - 1);
                     } else {
                         // Handle failures
                         // ...
