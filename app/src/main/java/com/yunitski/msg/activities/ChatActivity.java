@@ -24,8 +24,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
@@ -84,6 +86,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<MSGmessage> msGmessageArrayList;
 
     FloatingActionButton floatingActionButton;
+    private TextView userTitleTextView;
+    private ImageView profilePhotoImageView;
+    private LinearLayout titleLinearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +115,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             recipientUserId = intent.getStringExtra("recipientUserId");
             recipientUserName = intent.getStringExtra("recipientUserName");
         }
-        setTitle(recipientUserName);
+        //setTitle(recipientUserName);
+        setTitle("");
+
 
         msGmessageArrayList = new ArrayList<>();
 
@@ -121,6 +128,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatItemLinearLayout = findViewById(R.id.chatItemLinearLayout);
         floatingActionButton = findViewById(R.id.fabBottom);
         floatingActionButton.setOnClickListener(this);
+        userTitleTextView = findViewById(R.id.userTitleTextView);
+        profilePhotoImageView = findViewById(R.id.profilePhotoImageView);
+        titleLinearLayout = findViewById(R.id.titleLinearLayout);
+        userTitleTextView.setText(recipientUserName);
+        titleLinearLayout.setOnClickListener(this);
 
         gmessages = new ArrayList<>();
         adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
@@ -230,27 +242,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         messagesDatabaseReference.addChildEventListener(messagesChildEventListener);
-//        messageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView view, int scrollState) {
-//
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-//
-//                if (totalItemCount > 0)
-//                {
-//                    int lastInScreen = firstVisibleItem + visibleItemCount;
-//                    if(lastInScreen == totalItemCount)
-//                    {
-//
-//                        //Notify the adapter about the data set change.
-//                        adapter.notifyDataSetChanged();
-//                    }
-//                }
-//            }
-//        });
         messageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
             private int lastFirstVisibleItem;
@@ -271,18 +262,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }else {
                     floatingActionButton.setVisibility(View.INVISIBLE);
                 }
-//                if(lastFirstVisibleItem<firstVisibleItem){
-//                    Toast.makeText(getApplicationContext(), " oi" + msGmessageArrayList.size() + "\n" + adapter.getCount(), Toast.LENGTH_SHORT).show();
-//
-//                    if (lastFirstVisibleItem < msGmessageArrayList.size() - 5) {
-//
-//                    floatingActionButton.setVisibility(View.VISIBLE);
-//
-//                                    }else {
-//                    floatingActionButton.setVisibility(View.INVISIBLE);
-//                }
-//                }
-//                lastFirstVisibleItem=firstVisibleItem;
             }
         });
     }
@@ -321,6 +300,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             startActivityForResult(Intent.createChooser(intent, "Choose an image"), RC_IMAGE_PICKER);
         } else if (v.getId() == R.id.fabBottom){
             messageListView.setSelection(adapter.getCount() - 1);
+        } else if (v.getId() == R.id.titleLinearLayout){
+//            Toast.makeText(getApplicationContext(), )
         }
     }
 
@@ -364,8 +345,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
-//        messageListView.setStackFromBottom(true);
-//        adapter.notifyDataSetChanged();
     }
 
 
@@ -377,10 +356,5 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 break;
         }
         return true;
-    }
-
-    private void hideKeyboard(){
-        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(messageEditText.getWindowToken(), 0);
     }
 }

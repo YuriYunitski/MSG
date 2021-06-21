@@ -13,8 +13,8 @@
         android:paddingBottom="10dp">
 
         <ImageView
-            android:layout_width="@dimen/_120sdp"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/_150sdp"
+            android:layout_height="@dimen/_160sdp"
             android:id="@+id/photoImageView"
             android:paddingBottom="10dp"/>
 
@@ -23,6 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
+            android:paddingBottom="4dp"
             android:textSize="@dimen/_12sdp"/>
 
         <TextView

@@ -27,7 +27,9 @@
                 style="@style/Platform.MaterialComponents.Light"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:titleTextColor="@color/white" />
+                app:titleTextColor="@color/white" >
+
+            </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 
