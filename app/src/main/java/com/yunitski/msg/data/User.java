@@ -6,17 +6,18 @@ public class User {
     private String id;
     private int avatarMockupResource;
     private String lastMessage;
+    private String profilePhotoUrl;
 
     public User() {
     }
 
-
-    public User(String name, String email, String id, int avatarMockupResource, String lastMessage) {
+    public User(String name, String email, String id, int avatarMockupResource, String lastMessage, String profilePhotoUrl) {
         this.name = name;
         this.email = email;
         this.id = id;
         this.avatarMockupResource = avatarMockupResource;
         this.lastMessage = lastMessage;
+        this.profilePhotoUrl = profilePhotoUrl;
     }
 
     public String getName() {
@@ -57,5 +58,13 @@ public class User {
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public String getProfilePhotoUrl() {
+        return profilePhotoUrl;
+    }
+
+    public void setProfilePhotoUrl(String profilePhotoUrl) {
+        this.profilePhotoUrl = profilePhotoUrl;
     }
 }
