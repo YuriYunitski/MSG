@@ -54,7 +54,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserAdapter.UserViewHolder holder, int position) {
         User currentUser = users.get(position);
 
-        holder.avatarImageView.setImageResource(currentUser.getAvatarMockupResource());
+        //holder.avatarImageView.setImageResource(currentUser.getAvatarMockupResource());
+        Glide.with(holder.avatarImageView).load(currentUser.getProfilePhotoUrl()).into(holder.avatarImageView);
         holder.userNameTextView.setText(currentUser.getName());
         lastMessage(currentUser.getId(), holder.userLastMessageTextView);
 

@@ -37,19 +37,20 @@
 
                     <ImageView
                         android:id="@+id/profilePhotoImageView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
+                        android:layout_width="@dimen/_30sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_weight="1"
                         android:src="@drawable/ic_baseline_person_24"/>
 
 
                     <TextView
                         android:id="@+id/userTitleTextView"
+                        android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="oi"
-                        android:paddingStart="8dp"
                         android:layout_gravity="center"
+                        android:paddingStart="8dp"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_16sdp"/>
 

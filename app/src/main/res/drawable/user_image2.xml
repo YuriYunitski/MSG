@@ -3,4 +3,5 @@
 
     <item android:drawable="@drawable/circle_background2"/>
     <item android:drawable="@drawable/ic_baseline_person_24"/>
+
 </layer-list>

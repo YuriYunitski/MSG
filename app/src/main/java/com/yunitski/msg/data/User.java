@@ -8,11 +8,12 @@ public class User {
     private String lastMessage;
     private String profilePhotoUrl;
     private String pushId;
+    private String password;
 
     public User() {
     }
 
-    public User(String name, String email, String id, int avatarMockupResource, String lastMessage, String profilePhotoUrl, String pushId) {
+    public User(String name, String email, String id, int avatarMockupResource, String lastMessage, String profilePhotoUrl, String pushId, String password) {
         this.name = name;
         this.email = email;
         this.id = id;
@@ -20,6 +21,7 @@ public class User {
         this.lastMessage = lastMessage;
         this.profilePhotoUrl = profilePhotoUrl;
         this.pushId = pushId;
+        this.password = password;
     }
 
     public String getName() {
@@ -76,5 +78,13 @@ public class User {
 
     public void setPushId(String pushId) {
         this.pushId = pushId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

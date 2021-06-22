@@ -155,7 +155,7 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         intent.putExtra("recipientUserId", userArrayList.get(position).getId());
         intent.putExtra("recipientUserName", userArrayList.get(position).getName());
         intent.putExtra("userName", userName);
-        intent.putExtra("recipientUserAvatar", userArrayList.get(position).getAvatarMockupResource());
+        intent.putExtra("recipientUserAvatar", userArrayList.get(position).getProfilePhotoUrl());
         startActivity(intent);
     }
 

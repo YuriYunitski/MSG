@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -35,6 +36,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.MSGAdapter;
 import com.yunitski.msg.data.MSGmessage;
@@ -71,7 +73,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout chatItemLinearLayout;
 
     private String recipientUserName;
-    private int recipientUserAvatar;
+    private String recipientUserAvatar;
     private ArrayList<MSGmessage> msGmessageArrayList;
 
     FloatingActionButton floatingActionButton;
@@ -103,7 +105,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             userName = intent.getStringExtra("userName");
             recipientUserId = intent.getStringExtra("recipientUserId");
             recipientUserName = intent.getStringExtra("recipientUserName");
-            recipientUserAvatar = intent.getIntExtra("recipientUserAvatar", 2131165370);
+            recipientUserAvatar = intent.getStringExtra("recipientUserAvatar");
         }
         //setTitle(recipientUserName);
         setTitle("");
@@ -167,7 +169,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 User user = snapshot.getValue(User.class);
                 if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                     userName = user.getName();
-                    profilePhotoImageView.setBackgroundResource(recipientUserAvatar);
+                    //Glide.with(profilePhotoImageView).load(user.getProfilePhotoUrl()).into(profilePhotoImageView);
+                    Picasso.get().load(recipientUserAvatar).into(profilePhotoImageView);
                     userTitleTextView.setText(recipientUserName);
 
                 }
@@ -325,6 +328,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setImageUrl(downloadUri.toString());
+                        Toast.makeText(getApplicationContext(), "" + downloadUri.toString(), Toast.LENGTH_SHORT).show();
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);
