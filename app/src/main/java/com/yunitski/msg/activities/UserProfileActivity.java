@@ -2,15 +2,20 @@ package com.yunitski.msg.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
@@ -46,6 +51,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     private ImageButton editUserNameImageButton;
     private static final int RC_IMAGE_PICKER = 1238;
 
+    private String pushId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +68,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         userNameTextView = findViewById(R.id.nameTextView);
         editUserNameImageButton = findViewById(R.id.editNameImageButton);
         profileImageView.setOnClickListener(this);
+        editUserNameImageButton.setOnClickListener(this);
 
         if (usersChildEventListener == null) {
             usersChildEventListener = new ChildEventListener() {
@@ -69,6 +77,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     User user = snapshot.getValue(User.class);
                     if (user.getId().equals(auth.getCurrentUser().getUid())) {
                         userNameTextView.setText(user.getName());
+                        pushId = snapshot.getKey();
                         Glide.with(profileImageView).load(user.getAvatarMockupResource()).into(profileImageView);
                     }
 
@@ -100,12 +109,40 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
 
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-        startActivityForResult(Intent.createChooser(intent, "Choose an image"), RC_IMAGE_PICKER);
-    }
+        if (v.getId() == R.id.profileImageView){
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+            startActivityForResult(Intent.createChooser(intent, "Choose an image"), RC_IMAGE_PICKER);
+        } else if (v.getId() == R.id.editNameImageButton){
+            AlertDialog.Builder builder = new AlertDialog.Builder(UserProfileActivity.this);
+            builder.setCancelable(true);
+            builder.setTitle("Изменить имя пользователя");
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.name_update_dialog, null);
+            builder.setView(view);
+            EditText nameUpdateEditText = view.findViewById(R.id.nameUpdateEditText);
+            nameUpdateEditText.setText(userName);
+            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
 
+                    FirebaseDatabase  database = FirebaseDatabase.getInstance();
+                    DatabaseReference mDatabaseRef = database.getReference();
+
+                    mDatabaseRef.child("users").child(pushId).child("name").setValue(nameUpdateEditText.getText().toString());
+                }
+            });
+            builder.setNegativeButton("отмена", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.create().show();
+        }
+
+    }
 //    @Override
 //    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
