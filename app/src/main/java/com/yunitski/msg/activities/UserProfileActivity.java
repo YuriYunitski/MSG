@@ -70,7 +70,11 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         profileImageView.setOnClickListener(this);
         editUserNameImageButton.setOnClickListener(this);
 
-        if (usersChildEventListener == null) {
+        updUI();
+
+    }
+
+    private void updUI(){
             usersChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -103,7 +107,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 }
             };
             usersDatabaseReference.addChildEventListener(usersChildEventListener);
-        }
+
     }
 
     @Override
@@ -122,7 +126,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
             View view = inflater.inflate(R.layout.name_update_dialog, null);
             builder.setView(view);
             EditText nameUpdateEditText = view.findViewById(R.id.nameUpdateEditText);
-            nameUpdateEditText.setText(userName);
+            nameUpdateEditText.setText(userNameTextView.getText().toString());
             builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -131,6 +135,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     DatabaseReference mDatabaseRef = database.getReference();
 
                     mDatabaseRef.child("users").child(pushId).child("name").setValue(nameUpdateEditText.getText().toString());
+                    userNameTextView.setText(nameUpdateEditText.getText().toString());
                 }
             });
             builder.setNegativeButton("отмена", new DialogInterface.OnClickListener() {
