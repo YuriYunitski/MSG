@@ -69,7 +69,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                     User user = snapshot.getValue(User.class);
                     if (user.getId().equals(auth.getCurrentUser().getUid())) {
                         userNameTextView.setText(user.getName());
-//                        Glide.with(profileImageView).load(user.getAvatarMockupResource()).into(profileImageView);
+                        Glide.with(profileImageView).load(user.getAvatarMockupResource()).into(profileImageView);
                     }
 
                 }

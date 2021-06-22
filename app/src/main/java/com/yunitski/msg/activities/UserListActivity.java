@@ -87,7 +87,20 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                     User user = snapshot.getValue(User.class);
                     if (!user.getId().equals(auth.getCurrentUser().getUid()) ) {
-                        user.setAvatarMockupResource(R.drawable.ic_baseline_person_24);
+//                        int r = (int)(Math.random()*5);
+//                        if (r == 0){
+//                            user.setAvatarMockupResource(R.drawable.user_image);
+//                        } else if (r == 1){
+//                            user.setAvatarMockupResource(R.drawable.user_image1);
+//                        } else if (r == 2){
+//                            user.setAvatarMockupResource(R.drawable.user_image2);
+//                        } else if (r == 3){
+//                            user.setAvatarMockupResource(R.drawable.user_image3);
+//                        } else if (r == 4){
+//                            user.setAvatarMockupResource(R.drawable.user_image4);
+//                        }
+
+
                         userArrayList.add(user);
                         userAdapter.notifyDataSetChanged();
                     }
@@ -142,6 +155,7 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         intent.putExtra("recipientUserId", userArrayList.get(position).getId());
         intent.putExtra("recipientUserName", userArrayList.get(position).getName());
         intent.putExtra("userName", userName);
+        intent.putExtra("recipientUserAvatar", userArrayList.get(position).getAvatarMockupResource());
         startActivity(intent);
     }
 

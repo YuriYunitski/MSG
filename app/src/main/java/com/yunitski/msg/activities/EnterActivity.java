@@ -163,6 +163,18 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
         user.setId(firebaseUser.getUid());
         user.setEmail(firebaseUser.getEmail());
         user.setName(nameEditText.getText().toString().trim());
+        int r = (int)(Math.random()*5);
+        if (r == 0){
+            user.setAvatarMockupResource(R.drawable.user_image);
+        } else if (r == 1){
+            user.setAvatarMockupResource(R.drawable.user_image1);
+        } else if (r == 2){
+            user.setAvatarMockupResource(R.drawable.user_image2);
+        } else if (r == 3){
+            user.setAvatarMockupResource(R.drawable.user_image3);
+        } else if (r == 4){
+            user.setAvatarMockupResource(R.drawable.user_image4);
+        }
 
         usersDatabaseReference.push().setValue(user);
     }

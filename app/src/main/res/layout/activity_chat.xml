@@ -49,7 +49,7 @@
                         android:layout_height="wrap_content"
                         android:text="oi"
                         android:paddingStart="8dp"
-                        android:layout_gravity=""
+                        android:layout_gravity="center"
                         android:textColor="@color/white"
                         android:textSize="@dimen/_16sdp"/>
 

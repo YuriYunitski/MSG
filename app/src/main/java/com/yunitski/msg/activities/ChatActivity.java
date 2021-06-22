@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -70,6 +71,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     LinearLayout chatItemLinearLayout;
 
     private String recipientUserName;
+    private int recipientUserAvatar;
     private ArrayList<MSGmessage> msGmessageArrayList;
 
     FloatingActionButton floatingActionButton;
@@ -101,6 +103,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             userName = intent.getStringExtra("userName");
             recipientUserId = intent.getStringExtra("recipientUserId");
             recipientUserName = intent.getStringExtra("recipientUserName");
+            recipientUserAvatar = intent.getIntExtra("recipientUserAvatar", 2131165370);
         }
         //setTitle(recipientUserName);
         setTitle("");
@@ -118,7 +121,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         userTitleTextView = findViewById(R.id.userTitleTextView);
         profilePhotoImageView = findViewById(R.id.profilePhotoImageView);
         titleLinearLayout = findViewById(R.id.titleLinearLayout);
-        userTitleTextView.setText(recipientUserName);
         titleLinearLayout.setOnClickListener(this);
 
         gmessages = new ArrayList<>();
@@ -165,6 +167,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 User user = snapshot.getValue(User.class);
                 if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                     userName = user.getName();
+                    profilePhotoImageView.setBackgroundResource(recipientUserAvatar);
+                    userTitleTextView.setText(recipientUserName);
 
                 }
             }
