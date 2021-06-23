@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -81,6 +83,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView profilePhotoImageView;
     private LinearLayout titleLinearLayout;
 
+    private CheckBox selectMessageCheckBox;
+
+    private boolean check;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +130,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         profilePhotoImageView = findViewById(R.id.profilePhotoImageView);
         titleLinearLayout = findViewById(R.id.titleLinearLayout);
         titleLinearLayout.setOnClickListener(this);
+        selectMessageCheckBox = findViewById(R.id.selectMessageCheckBox);
 
         gmessages = new ArrayList<>();
         adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
@@ -140,6 +147,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
+        adapter.setOnLongMessageClickListener(new MSGAdapter.OnLongMessageClickListener() {
+            @Override
+            public void onMessageClick(int position) {
+
+            }
+        });
+
 
 //        messageListView.setStackFromBottom(true);
 //        adapter.notifyDataSetChanged();
@@ -238,28 +252,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         messagesDatabaseReference.addChildEventListener(messagesChildEventListener);
         messageListView.setOnScrollListener(new AbsListView.OnScrollListener() {
 
-            private int lastFirstVisibleItem;
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
 
-                if (view.getId() == messageListView.getId()){
-                    final int currentFirstVisibleItem = messageListView.getLastVisiblePosition();
-
-                }
             }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem < (totalItemCount - 13)) {
-
+                if (firstVisibleItem < (totalItemCount - 10)) {
                     floatingActionButton.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     floatingActionButton.setVisibility(View.INVISIBLE);
                 }
             }
         });
+        registerForContextMenu(messageListView);
     }
 
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//        super.onCreateContextMenu(menu, v, menuInfo);
+//        if (v.getId() == R.id.messageLinearLayout || v.getId() == R.id.photoImageView){
+//            menu.add(0, 0, 0, "Red");
+//        }
+//    }
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();
@@ -328,7 +344,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setImageUrl(downloadUri.toString());
-                        Toast.makeText(getApplicationContext(), "" + downloadUri.toString(), Toast.LENGTH_SHORT).show();
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);

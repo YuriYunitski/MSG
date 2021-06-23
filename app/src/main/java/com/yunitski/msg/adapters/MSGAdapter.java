@@ -2,11 +2,18 @@ package com.yunitski.msg.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +31,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
     private Activity activity;
     private OnPhotoClickListener listener;
+    private OnLongMessageClickListener listenerMess;
 
     public MSGAdapter(@NonNull Activity context, int resource, List<MSGmessage> messages) {
         super(context, resource, messages);
@@ -37,6 +45,14 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
     public void setOnPhotoClickListener(OnPhotoClickListener listener){
         this.listener = listener;
+    }
+
+    public interface OnLongMessageClickListener{
+        void onMessageClick(int position);
+    }
+
+    public void setOnLongMessageClickListener(OnLongMessageClickListener listener){
+        this.listenerMess = listener;
     }
 
     @NonNull
@@ -63,6 +79,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         }
+//        viewHolder.selectMessageCheckBox.setVisibility(View.GONE);
         boolean isText = msGmessage.getImageUrl() == null;
         if (isText){
             viewHolder.messageTextView.setVisibility(View.VISIBLE);
@@ -82,7 +99,23 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                     listener.onUserClick(position);
                 }
             });
+            viewHolder.photoImageView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    int position = getPosition(msGmessage);
+                    listenerMess.onMessageClick(position);
+                    return true;
+                }
+            });
         }
+        viewHolder.messageLinearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int position = getPosition(msGmessage);
+                listenerMess.onMessageClick(position);
+                return true;
+            }
+        });
         return convertView;
     }
 
@@ -107,11 +140,15 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
     private class ViewHolder{
         private TextView messageTextView, messageTimeTextView;
         private ImageView photoImageView;
+        private LinearLayout messageLinearLayout;
+//        private CheckBox selectMessageCheckBox;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
             messageTextView = view.findViewById(R.id.messageTextView);
             messageTimeTextView = view.findViewById(R.id.messageTimeTextView);
+            messageLinearLayout = view.findViewById(R.id.messageLinearLayout);
+//            selectMessageCheckBox = view.findViewById(R.id.selectMessageCheckBox);
         }
     }
 
