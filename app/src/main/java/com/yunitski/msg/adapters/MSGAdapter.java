@@ -55,6 +55,11 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         this.listenerMess = listener;
     }
 
+    private int listPosition;
+    public int getPositionList(){
+        return listPosition;
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
@@ -79,6 +84,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             viewHolder = new ViewHolder(convertView);
             convertView.setTag(viewHolder);
         }
+
+
 //        viewHolder.selectMessageCheckBox.setVisibility(View.GONE);
         boolean isText = msGmessage.getImageUrl() == null;
         if (isText){
@@ -99,25 +106,46 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                     listener.onUserClick(position);
                 }
             });
-            viewHolder.photoImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            viewHolder.photoImageView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
                 @Override
-                public boolean onLongClick(View v) {
-                    int position = getPosition(msGmessage);
-                    listenerMess.onMessageClick(position);
-                    return true;
+                public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+
                 }
             });
+//            viewHolder.photoImageView.setOnLongClickListener(new View.OnLongClickListener() {
+//                @Override
+//                public boolean onLongClick(View v) {
+//                    int position = getPosition(msGmessage);
+//                    listenerMess.onMessageClick(position);
+//                    return true;
+//                }
+//            });
         }
-        viewHolder.messageLinearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+        viewHolder.messageLinearLayout.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
-            public boolean onLongClick(View v) {
-                int position = getPosition(msGmessage);
-                listenerMess.onMessageClick(position);
-                return true;
+            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+                menu.add(0, 1, getPosition(msGmessage), "action 1");
+                //установка бэкграунда контекстного меню
+                int positionOfMenuItem = 0;
+
+                listPosition = getPosition(msGmessage);
+                MenuItem item = menu.getItem(positionOfMenuItem);
+                SpannableString s = new SpannableString("Удалить");
+                s.setSpan(new ForegroundColorSpan(Color.BLACK), 0, s.length(), 0);
+                item.setTitle(s);
             }
         });
+//        viewHolder.messageLinearLayout.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View v) {
+//                int position = getPosition(msGmessage);
+//                listenerMess.onMessageClick(position);
+//                return true;
+//            }
+//        });
         return convertView;
     }
+
 
     @Override
     public int getItemViewType(int position) {

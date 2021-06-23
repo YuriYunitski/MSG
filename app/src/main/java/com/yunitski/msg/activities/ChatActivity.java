@@ -87,6 +87,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private boolean check;
 
+    private String pushId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,12 +149,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
-        adapter.setOnLongMessageClickListener(new MSGAdapter.OnLongMessageClickListener() {
-            @Override
-            public void onMessageClick(int position) {
-
-            }
-        });
+//        adapter.setOnLongMessageClickListener(new MSGAdapter.OnLongMessageClickListener() {
+//            @Override
+//            public void onMessageClick(int position) {
+//
+//            }
+//        });
 
 
 //        messageListView.setStackFromBottom(true);
@@ -216,17 +218,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 MSGmessage message = snapshot.getValue(MSGmessage.class);
                 if (message.getSender().equals(auth.getCurrentUser().getUid())
-                        && message.getRecipient().equals(recipientUserId)) {
+                        && message.getRecipient().equals(recipientUserId) && !message.isDeleted()) {
                     message.setMine(true);
                     message.setName(userName);
                     msGmessageArrayList.add(message);
                     adapter.add(message);
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
-                        && message.getSender().equals(recipientUserId)) {
+                        && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
                     message.setMine(false);
                     msGmessageArrayList.add(message);
                     adapter.add(message);
                 }
+                pushId = snapshot.getKey();
             }
 
             @Override
@@ -276,6 +279,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //            menu.add(0, 0, 0, "Red");
 //        }
 //    }
+
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        int pos = adapter.getPositionList();
+        Toast.makeText(getApplicationContext(), "pos - " + pos, Toast.LENGTH_SHORT).show();
+
+        FirebaseDatabase  database = FirebaseDatabase.getInstance();
+        DatabaseReference mDatabaseRef = database.getReference();
+        mDatabaseRef.child("messages").child(pushId).child("deleted").setValue(true);
+        return super.onContextItemSelected(item);
+    }
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();

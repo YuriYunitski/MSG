@@ -8,11 +8,12 @@ public class MSGmessage {
     private String recipient;
     private boolean isMine;
     private String time;
+    private boolean isDeleted;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -20,6 +21,7 @@ public class MSGmessage {
         this.recipient = recipient;
         this.isMine = isMine;
         this.time = time;
+        this.isDeleted = isDeleted;
     }
 
     public String getText() {
@@ -76,5 +78,13 @@ public class MSGmessage {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
