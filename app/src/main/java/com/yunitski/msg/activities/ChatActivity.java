@@ -83,12 +83,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView profilePhotoImageView;
     private LinearLayout titleLinearLayout;
 
-    private CheckBox selectMessageCheckBox;
-
-    private boolean check;
-
-    private String pushId;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,7 +109,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             recipientUserName = intent.getStringExtra("recipientUserName");
             recipientUserAvatar = intent.getStringExtra("recipientUserAvatar");
         }
-        //setTitle(recipientUserName);
         setTitle("");
 
 
@@ -132,7 +125,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         profilePhotoImageView = findViewById(R.id.profilePhotoImageView);
         titleLinearLayout = findViewById(R.id.titleLinearLayout);
         titleLinearLayout.setOnClickListener(this);
-        selectMessageCheckBox = findViewById(R.id.selectMessageCheckBox);
 
         gmessages = new ArrayList<>();
         adapter = new MSGAdapter(this, R.layout.message_item, gmessages);
@@ -143,22 +135,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
             @Override
             public void onUserClick(int position) {
-//                Toast.makeText(getApplicationContext(), "oi " + position, Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(ChatActivity.this, PhotoActivity.class);
                 intent.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
                 startActivity(intent);
             }
         });
-//        adapter.setOnLongMessageClickListener(new MSGAdapter.OnLongMessageClickListener() {
-//            @Override
-//            public void onMessageClick(int position) {
-//
-//            }
-//        });
-
-
-//        messageListView.setStackFromBottom(true);
-//        adapter.notifyDataSetChanged();
 
         messageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -185,7 +166,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 User user = snapshot.getValue(User.class);
                 if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                     userName = user.getName();
-                    //Glide.with(profilePhotoImageView).load(user.getProfilePhotoUrl()).into(profilePhotoImageView);
                     Picasso.get().load(recipientUserAvatar).into(profilePhotoImageView);
                     userTitleTextView.setText(recipientUserName);
 
@@ -218,27 +198,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 MSGmessage message = snapshot.getValue(MSGmessage.class);
                 if (message.getSender().equals(auth.getCurrentUser().getUid())
-                        && message.getRecipient().equals(recipientUserId) && !message.isDeleted()) {
+                        && message.getRecipient().equals(recipientUserId)) {
                     message.setMine(true);
                     message.setName(userName);
+                    message.setPusId(snapshot.getKey());
                     msGmessageArrayList.add(message);
                     adapter.add(message);
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
                     message.setMine(false);
+                    message.setPusId(snapshot.getKey());
                     msGmessageArrayList.add(message);
                     adapter.add(message);
                 }
-                pushId = snapshot.getKey();
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
 
             }
 
@@ -272,24 +253,37 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         registerForContextMenu(messageListView);
     }
 
-//    @Override
-//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-//        super.onCreateContextMenu(menu, v, menuInfo);
-//        if (v.getId() == R.id.messageLinearLayout || v.getId() == R.id.photoImageView){
-//            menu.add(0, 0, 0, "Red");
-//        }
-//    }
-
-
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         int pos = adapter.getPositionList();
-        Toast.makeText(getApplicationContext(), "pos - " + pos, Toast.LENGTH_SHORT).show();
 
         FirebaseDatabase  database = FirebaseDatabase.getInstance();
         DatabaseReference mDatabaseRef = database.getReference();
-        mDatabaseRef.child("messages").child(pushId).child("deleted").setValue(true);
+
+        if (msGmessageArrayList.get(pos).isMine()){
+
+            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).removeValue();
+            msGmessageArrayList.remove(pos);
+            adapter.clear();
+            adapter.addAll(msGmessageArrayList);
+            adapter.notifyDataSetChanged();
+
+        } else {
+
+            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).child("deleted").setValue(true);
+            msGmessageArrayList.remove(pos);
+            adapter.clear();
+            adapter.addAll(msGmessageArrayList);
+            adapter.notifyDataSetChanged();
+
+        }
+
         return super.onContextItemSelected(item);
+
+    }
+
+    private void updUI(){
+
     }
 
     private String currentDate(){

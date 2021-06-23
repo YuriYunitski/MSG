@@ -60,6 +60,10 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         return listPosition;
     }
 
+    public void removeData(int positionRemove){
+        gmessages.remove(positionRemove);
+    }
+
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {

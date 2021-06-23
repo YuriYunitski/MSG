@@ -9,11 +9,12 @@ public class MSGmessage {
     private boolean isMine;
     private String time;
     private boolean isDeleted;
+    private String pusId;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -22,6 +23,7 @@ public class MSGmessage {
         this.isMine = isMine;
         this.time = time;
         this.isDeleted = isDeleted;
+        this.pusId = pusId;
     }
 
     public String getText() {
@@ -86,5 +88,13 @@ public class MSGmessage {
 
     public void setDeleted(boolean deleted) {
         isDeleted = deleted;
+    }
+
+    public String getPusId() {
+        return pusId;
+    }
+
+    public void setPusId(String pusId) {
+        this.pusId = pusId;
     }
 }
