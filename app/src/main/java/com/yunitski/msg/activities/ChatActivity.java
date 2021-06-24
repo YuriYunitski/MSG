@@ -208,9 +208,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
                     message.setMine(false);
                     message.setPusId(snapshot.getKey());
+
+                    FirebaseDatabase  database = FirebaseDatabase.getInstance();
+                    DatabaseReference mDatabaseRef = database.getReference();
+                    mDatabaseRef.child("messages").child(message.getPusId()).child("read").setValue(true);
                     msGmessageArrayList.add(message);
                     adapter.add(message);
                 }
+                if (!message.isMine()){
+                }
+
+
+
             }
 
             @Override
@@ -243,7 +252,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                if (firstVisibleItem < (totalItemCount - 10)) {
+                if (firstVisibleItem < (totalItemCount - 13)) {
                     floatingActionButton.setVisibility(View.VISIBLE);
                 } else {
                     floatingActionButton.setVisibility(View.INVISIBLE);
@@ -263,26 +272,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         if (msGmessageArrayList.get(pos).isMine()){
 
             mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).removeValue();
-            msGmessageArrayList.remove(pos);
-            adapter.clear();
-            adapter.addAll(msGmessageArrayList);
-            adapter.notifyDataSetChanged();
 
         } else {
 
             mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).child("deleted").setValue(true);
-            msGmessageArrayList.remove(pos);
-            adapter.clear();
-            adapter.addAll(msGmessageArrayList);
-            adapter.notifyDataSetChanged();
 
         }
+        msGmessageArrayList.remove(pos);
+        adapter.clear();
+        adapter.addAll(msGmessageArrayList);
+        adapter.notifyDataSetChanged();
 
         return super.onContextItemSelected(item);
-
-    }
-
-    private void updUI(){
 
     }
 
