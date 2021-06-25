@@ -5,7 +5,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -83,6 +85,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView profilePhotoImageView;
     private LinearLayout titleLinearLayout;
 
+    private boolean isActive;
+
+    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +119,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
         msGmessageArrayList = new ArrayList<>();
+        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isActive", true);
+        editor.apply();
+
+
 
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
@@ -209,13 +221,20 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     message.setMine(false);
                     message.setPusId(snapshot.getKey());
 
-                    FirebaseDatabase  database = FirebaseDatabase.getInstance();
-                    DatabaseReference mDatabaseRef = database.getReference();
-                    mDatabaseRef.child("messages").child(message.getPusId()).child("read").setValue(true);
                     msGmessageArrayList.add(message);
                     adapter.add(message);
-                }
-                if (!message.isMine()){
+                   }
+                if (!message.getSender().equals(auth.getCurrentUser().getUid())
+                        && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
+                        && message.getSender().equals(recipientUserId) && !message.isDeleted()){
+
+                    sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+                    boolean isA = sharedPreferences.getBoolean("isActive", true);
+                    if (isA){
+                        FirebaseDatabase  database = FirebaseDatabase.getInstance();
+                        DatabaseReference mDatabaseRef = database.getReference();
+                        mDatabaseRef.child("messages").child(msGmessageArrayList.get(msGmessageArrayList.size() - 1).getPusId()).child("read").setValue(true);
+                    }
                 }
 
 
@@ -261,6 +280,19 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         });
         registerForContextMenu(messageListView);
     }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isActive", false);
+        editor.apply();
+    }
+
+
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {

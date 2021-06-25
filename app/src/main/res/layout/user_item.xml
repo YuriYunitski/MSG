@@ -48,7 +48,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_baseline_mail_24"
-                    android:id="@+id/messagesToRearImageView"/>
+                    android:id="@+id/messagesToRearImageView"
+                    android:visibility="invisible"/>
 
             </LinearLayout>
 

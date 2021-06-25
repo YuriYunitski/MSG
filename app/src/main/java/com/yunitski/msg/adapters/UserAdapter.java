@@ -1,4 +1,4 @@
-package com.yunitski.msg.adapters;
+ package com.yunitski.msg.adapters;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,7 +143,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
                         showIcon = message.isRead();
 
-                        isMy = message.isMine();
+                        isMy = message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId);
                     }
                 }
                 if ("default".equals(lastMess)) {
@@ -153,7 +153,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 } else {
                     lastMsg.setText("Фото");
                 }
-                if (!showIcon && !isMy){
+                if (!showIcon && isMy){
                     imageView.setVisibility(View.VISIBLE);
                 } else {
                     imageView.setVisibility(View.INVISIBLE);
