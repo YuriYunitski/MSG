@@ -85,7 +85,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView profilePhotoImageView;
     private LinearLayout titleLinearLayout;
 
-    private boolean isActive;
 
     SharedPreferences sharedPreferences;
 

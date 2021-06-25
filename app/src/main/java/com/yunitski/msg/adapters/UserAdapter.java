@@ -32,6 +32,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private String lastMess;
 
+    private String lastMessageTime;
+
     private boolean showIcon;
 
     private boolean isMy;
@@ -63,7 +65,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         //holder.avatarImageView.setImageResource(currentUser.getAvatarMockupResource());
         Glide.with(holder.avatarImageView).load(currentUser.getProfilePhotoUrl()).into(holder.avatarImageView);
         holder.userNameTextView.setText(currentUser.getName());
-        lastMessage(currentUser.getId(), holder.userLastMessageTextView, holder.messagesToRearImageView);
+        lastMessage(currentUser.getId(), holder.userLastMessageTextView, holder.messagesToRearImageView, holder.lastMessageTimeTextView);
 
 
     }
@@ -76,7 +78,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder{
 
         public ImageView avatarImageView, messagesToRearImageView;
-        public TextView userNameTextView, userLastMessageTextView;
+        public TextView userNameTextView, userLastMessageTextView, lastMessageTimeTextView;
 
         public UserViewHolder(@NonNull View itemView, OnUserClickListener listener) {
             super(itemView);
@@ -85,6 +87,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             userNameTextView = itemView.findViewById(R.id.userNameTextView);
             userLastMessageTextView = itemView.findViewById(R.id.userLastMessageTextView);
             messagesToRearImageView = itemView.findViewById(R.id.messagesToRearImageView);
+            lastMessageTimeTextView = itemView.findViewById(R.id.lastMessageTimeTextView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -99,37 +102,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
     }
 
-    private void showIconMethod(String userId, ImageView imageView){
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-                    if (message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId) ||
-                            message.getRecipient().equals(userId) && message.getSender().equals(firebaseUser.getUid())){
-                        showIcon = message.isRead();
-                        boolean isMy = message.isMine();
-                        if (!showIcon && !isMy){
-                            imageView.setVisibility(View.VISIBLE);
-                        } else {
-                            imageView.setVisibility(View.INVISIBLE);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-    private void lastMessage(String userId, TextView lastMsg, ImageView imageView){
+    private void lastMessage(String userId, TextView lastMsg, ImageView imageView, TextView lmTime){
         lastMess = "default";
         showIcon = false;
         isMy = false;
+        lastMessageTime = "def";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
@@ -137,13 +114,15 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
                     MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-                    if (message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId) ||
-                            message.getRecipient().equals(userId) && message.getSender().equals(firebaseUser.getUid())){
+                    if (message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId) && !message.isDeleted() ||
+                            message.getRecipient().equals(userId) && message.getSender().equals(firebaseUser.getUid()) && !message.isDeleted()){
                         lastMess = message.getText();
 
                         showIcon = message.isRead();
 
                         isMy = message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId);
+
+                        lastMessageTime = message.getTime();
                     }
                 }
                 if ("default".equals(lastMess)) {
@@ -158,9 +137,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 } else {
                     imageView.setVisibility(View.INVISIBLE);
                 }
+                lmTime.setText(lastMessageTime);
                 lastMess = "default";
                 showIcon = false;
                 isMy = false;
+                lastMessageTime = "def";
             }
 
             @Override
