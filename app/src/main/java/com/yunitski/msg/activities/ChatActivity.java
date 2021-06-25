@@ -87,6 +87,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
     SharedPreferences sharedPreferences;
+    ArrayList<String> urisList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         setTitle("");
 
 
+        urisList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
         sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -215,6 +217,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     message.setPusId(snapshot.getKey());
                     msGmessageArrayList.add(message);
                     adapter.add(message);
+                    if (message.getImageUrl() != null){
+                        urisList.add(message.getImageUrl());
+                    }
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
                     message.setMine(false);
@@ -222,6 +227,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                     msGmessageArrayList.add(message);
                     adapter.add(message);
+                    if (message.getImageUrl() != null){
+                        urisList.add(message.getImageUrl());
+                    }
                    }
                 if (!message.getSender().equals(auth.getCurrentUser().getUid())
                         && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
@@ -354,6 +362,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         } else if (v.getId() == R.id.titleLinearLayout){
             Intent intent = new Intent(ChatActivity.this, RecipientProfileActivity.class);
             intent.putExtra("recipientUserName", recipientUserName);
+            intent.putExtra("imageUris", urisList);
             startActivity(intent);
         }
     }

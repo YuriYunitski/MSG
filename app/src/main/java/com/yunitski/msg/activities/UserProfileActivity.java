@@ -7,6 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -39,6 +41,10 @@ import com.yunitski.msg.R;
 import com.yunitski.msg.data.MSGmessage;
 import com.yunitski.msg.data.User;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
 public class UserProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
 
@@ -51,7 +57,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
 
     private ImageView profileImageView;
     private TextView userNameTextView;
-    private ImageButton editUserNameImageButton;
+    private ImageButton editUserNameImageButton, backImageButton;
     private static final int RC_IMAGE_PICKER = 1238;
 
     private String pushId;
@@ -75,6 +81,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
         userNameTextView = findViewById(R.id.nameTextView);
         editUserNameImageButton = findViewById(R.id.editNameImageButton);
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
+        backImageButton = findViewById(R.id.backImageButton);
+        backImageButton.setOnClickListener(this);
         profileImageView.setOnClickListener(this);
         editUserNameImageButton.setOnClickListener(this);
         deleteAccountButton.setOnClickListener(this);
@@ -195,6 +203,8 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                 }
             });
             builder.create().show();
+        } else if (v.getId() == R.id.backImageButton){
+            UserProfileActivity.this.finish();
         }
 
     }
@@ -229,6 +239,7 @@ public class UserProfileActivity extends AppCompatActivity implements View.OnCli
                         assert downloadUri != null;
                         mDatabaseRef.child("users").child(pushId).child("profilePhotoUrl").setValue(downloadUri.toString());
                         Picasso.get().load(downloadUri.toString()).into(profileImageView);
+
 
                     } else {
                         // Handle failures

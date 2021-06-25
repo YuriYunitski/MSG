@@ -59,8 +59,8 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
         applyButton.setOnClickListener(this);
         registrationTextView.setOnClickListener(this);
         enterTextView.setOnClickListener(this);
-        registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
-        enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
+        registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
+        enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
         isLogInModeActive = false;
         isEnterSuccess = false;
         if (auth.getCurrentUser() != null){
@@ -74,15 +74,15 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
         if (v.getId() == R.id.applyButton){
             logInSignUpUser(emailEditText.getText().toString().trim(), passwordEditText.getText().toString().trim());
         } else if (v.getId() == R.id.registrationTextView){
-                registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
-                enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
+                registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
+                enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
                 applyButton.setText("Регистрация");
                 confirmPasswordEditText.setVisibility(View.VISIBLE);
                 isLogInModeActive = false;
         } else if (v.getId() == R.id.enterTextView){
 
-            registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
-            enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
+            registrationTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_gray));
+            enterTextView.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.back_white));
             applyButton.setText("Вход");
             confirmPasswordEditText.setVisibility(View.GONE);
             isLogInModeActive = true;

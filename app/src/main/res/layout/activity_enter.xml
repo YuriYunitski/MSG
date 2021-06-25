@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:transcriptMode="alwaysScroll"
+    android:background="#C4D3D1"
     tools:context=".activities.EnterActivity">
 
     <TextView
@@ -12,8 +13,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:background="@drawable/circle_logo"
         android:text="MSG"
-        android:textColor="#03A9F4"
+        android:padding="@dimen/_12sdp"
+        android:textColor="@color/white"
         android:textSize="90sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -112,8 +115,9 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:backgroundTint="@color/black"
+        android:backgroundTint="#5BE1C6"
         android:text="Регистрация"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameEditText" />

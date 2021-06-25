@@ -7,15 +7,29 @@
     android:background="@drawable/gradient_background_user_profile"
     tools:context=".activities.UserProfileActivity">
 
+
     <ImageView
         android:id="@+id/profileImageView"
         android:layout_width="@dimen/_150sdp"
         android:layout_height="@dimen/_150sdp"
+        android:maxHeight="@dimen/_150sdp"
+        android:maxWidth="@dimen/_150sdp"
+        android:minHeight="@dimen/_150sdp"
+        android:minWidth="@dimen/_150sdp"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_baseline_person_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+<!--    <ImageView-->
+<!--        android:id="@+id/imageView"-->
+<!--        android:layout_width="@dimen/_150sdp"-->
+<!--        android:layout_height="@dimen/_150sdp"-->
+<!--        app:layout_constraintBottom_toBottomOf="@+id/profileImageView"-->
+<!--        app:layout_constraintEnd_toEndOf="@+id/profileImageView"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/profileImageView"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/profileImageView"-->
+<!--        app:srcCompat="@drawable/ring" />-->
 
     <TextView
         android:id="@+id/nameTextView"
@@ -70,5 +84,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editNameImageButton" />
+
+    <ImageButton
+        android:id="@+id/backImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#AEC0C0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24"
+        tools:ignore="VectorDrawableCompat" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
