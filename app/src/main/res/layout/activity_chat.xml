@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/chat_background"
     tools:context=".activities.ChatActivity">
 
 
@@ -68,15 +69,16 @@
         android:id="@+id/mainActivityListView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:background="@drawable/chat_background"
         android:divider="@null"
         android:transcriptMode="alwaysScroll"
         app:layout_constraintBottom_toTopOf="@+id/messageEditText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" >
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
 
     </ListView>
@@ -85,7 +87,7 @@
         android:id="@+id/addContentImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="#DFDFDF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/messageEditText"
@@ -98,7 +100,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="#DFDFDF"
         app:layout_constraintTop_toTopOf="@+id/messageEditText"
         app:srcCompat="@drawable/ic_baseline_send_24"
         tools:ignore="VectorDrawableCompat" />

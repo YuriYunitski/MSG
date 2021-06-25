@@ -133,8 +133,8 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     private void buildRecyclerView() {
         userRecyclerView = findViewById(R.id.userListRecyclerView);
         userRecyclerView.setHasFixedSize(true);
-        userRecyclerView.addItemDecoration(new DividerItemDecoration(
-                userRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
+//        userRecyclerView.addItemDecoration(new DividerItemDecoration(
+//                userRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
         userLayoutManager = new LinearLayoutManager(this);
         userAdapter = new UserAdapter(userArrayList);
 

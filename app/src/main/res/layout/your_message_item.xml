@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/message_out"
+        android:background="@drawable/message_outcome_new"
         android:paddingBottom="10dp">
 
         <ImageView
