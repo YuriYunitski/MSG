@@ -106,7 +106,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         lastMess = "default";
         showIcon = false;
         isMy = false;
-        lastMessageTime = "def";
+        lastMessageTime = "";
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
@@ -141,7 +141,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 lastMess = "default";
                 showIcon = false;
                 isMy = false;
-                lastMessageTime = "def";
+                lastMessageTime = "";
             }
 
             @Override
