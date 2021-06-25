@@ -22,6 +22,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
     private List<ImagesInProfile> imagesInProfileList;
 
+    private OnImageClickListener listener;
+
+
+    public interface OnImageClickListener{
+        void onImageClick(int position);
+    }
+
+    public void setOnImageClickListener(OnImageClickListener listener){
+        this.listener = listener;
+    }
+
     public ImageAdapter(ArrayList<ImagesInProfile> imagesInProfileList){
         this.imagesInProfileList = imagesInProfileList;
     }
@@ -31,7 +42,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public ImageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.image_in_profile, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, listener);
     }
 
     @Override
@@ -39,7 +50,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
 
         ImagesInProfile imagesInProfile = imagesInProfileList.get(position);
         Picasso.get().load(imagesInProfile.getImageUrl()).into(holder.imageView);
-        holder.urlTextView.setText(imagesInProfile.getUrlString());
 
     }
 
@@ -51,11 +61,20 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
-        TextView urlTextView;
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, OnImageClickListener listener) {
             super(itemView);
             imageView = itemView.findViewById(R.id.imageInProfileImageView);
-            urlTextView = itemView.findViewById(R.id.urlTextView);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null){
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION){
+                            listener.onImageClick(position);
+                        }
+                    }
+                }
+            });
         }
     }
 }

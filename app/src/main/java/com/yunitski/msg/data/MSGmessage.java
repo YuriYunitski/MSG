@@ -11,11 +11,12 @@ public class MSGmessage {
     private boolean isDeleted;
     private String pusId;
     private boolean isRead;
+    private String videoUrl;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -26,6 +27,7 @@ public class MSGmessage {
         this.isDeleted = isDeleted;
         this.pusId = pusId;
         this.isRead = isRead;
+        this.videoUrl = videoUrl;
     }
 
     public String getText() {
@@ -106,5 +108,13 @@ public class MSGmessage {
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String videoUrl) {
+        this.videoUrl = videoUrl;
     }
 }

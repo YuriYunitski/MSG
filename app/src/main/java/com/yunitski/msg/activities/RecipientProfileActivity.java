@@ -1,6 +1,7 @@
 package com.yunitski.msg.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,7 +41,7 @@ public class RecipientProfileActivity extends AppCompatActivity {
         imagesInProfileArrayList = new ArrayList<>();
         Collections.reverse(urisList);
         for (int i = 0; i<urisList.size(); i++){
-            imagesInProfileArrayList.add(new ImagesInProfile(urisList.get(i), ""+i));
+            imagesInProfileArrayList.add(new ImagesInProfile(urisList.get(i)));
 //            Toast.makeText(getApplicationContext(), "" + urisList.get(i), Toast.LENGTH_SHORT).show();
             Log.d("imagesLog", "img: " + urisList.get(i));
         }
@@ -50,9 +51,20 @@ public class RecipientProfileActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
 
+//        r.addItemDecoration(new DividerItemDecoration(
+//                r.getContext(), DividerItemDecoration.HORIZONTAL));
         r.setHasFixedSize(true);
         r.setLayoutManager(layoutManager);
         adapter = new ImageAdapter( imagesInProfileArrayList);
         r.setAdapter(adapter);
+
+        adapter.setOnImageClickListener(new ImageAdapter.OnImageClickListener() {
+            @Override
+            public void onImageClick(int position) {
+                Intent intent = new Intent(RecipientProfileActivity.this, PhotoActivity.class);
+                intent.putExtra("photoUrl", imagesInProfileArrayList.get(position).getImageUrl());
+                startActivity(intent);
+            }
+        });
     }
 }

@@ -6,14 +6,9 @@
     android:orientation="vertical">
 
     <ImageView
-        android:layout_width="@dimen/_150sdp"
-        android:layout_height="@dimen/_150sdp"
+        android:layout_width="@dimen/_110sdp"
+        android:layout_height="@dimen/_110sdp"
         android:id="@+id/imageInProfileImageView"
         android:src="@drawable/ic_baseline_person_24"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/urlTextView"
-        android:text="oi"/>
 
 </LinearLayout>
