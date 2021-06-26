@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MSG.NoActionBar">
-        <activity android:name=".activities.RecipientProfileActivity"></activity>
+        <activity android:name=".activities.VideoActivity"></activity>
+        <activity android:name=".activities.MyOwnChatsActivity" />
+        <activity android:name=".activities.RecipientProfileActivity" />
         <activity android:name=".activities.UserProfileActivity" />
         <activity android:name=".activities.PhotoActivity" />
         <activity android:name=".activities.UserListActivity" />

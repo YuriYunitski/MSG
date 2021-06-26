@@ -3,6 +3,8 @@ package com.yunitski.msg.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.ContextMenu;
@@ -14,12 +16,18 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.ViewTarget;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 import com.yunitski.msg.R;
 import com.yunitski.msg.data.MSGmessage;
 
@@ -91,17 +99,23 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
 
 //        viewHolder.selectMessageCheckBox.setVisibility(View.GONE);
-        boolean isText = msGmessage.getImageUrl() == null;
+        boolean isText = msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null;
         if (isText){
             viewHolder.messageTextView.setVisibility(View.VISIBLE);
             viewHolder.photoImageView.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(msGmessage.getText());
             viewHolder.messageTimeTextView.setText(msGmessage.getTime());
-        } else {
+        } else if (msGmessage.getVideoUrl() == null){
 
             viewHolder.messageTextView.setVisibility(View.GONE);
             viewHolder.photoImageView.setVisibility(View.VISIBLE);
-            Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getImageUrl()).into(viewHolder.photoImageView);
+//            if (viewHolder.photoImageView.getLayoutParams().width < 900){
+//                viewHolder.photoImageView.getLayoutParams().width = 500;
+//            }
+
+            //viewHolder.photoImageView.requestLayout();
+            //Picasso.get().load(msGmessage.getImageUrl()).resize(0, 600).into(viewHolder.photoImageView);
+            Glide.with(viewHolder.photoImageView.getContext()).asBitmap().load(msGmessage.getImageUrl()).into(viewHolder.photoImageView);
             viewHolder.messageTimeTextView.setText(msGmessage.getTime());
             viewHolder.photoImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -124,6 +138,20 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 //                    return true;
 //                }
 //            });
+        } else if (msGmessage.getImageUrl() == null){
+
+            viewHolder.messageTextView.setVisibility(View.VISIBLE);
+            viewHolder.messageTextView.setText("ᐅ");
+            viewHolder.photoImageView.setVisibility(View.VISIBLE);
+            Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getVideoUrl()).into(viewHolder.photoImageView);
+            viewHolder.photoImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
+                }
+            });
+            viewHolder.messageTimeTextView.setText(msGmessage.getTime());
         }
         viewHolder.messageLinearLayout.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override

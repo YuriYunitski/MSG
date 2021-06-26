@@ -1,5 +1,6 @@
  package com.yunitski.msg.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private boolean isMy;
 
+    private boolean video;
+    private boolean photo;
+
 
     public interface OnUserClickListener{
         void onUserClick(int position);
@@ -67,8 +71,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.userNameTextView.setText(currentUser.getName());
         lastMessage(currentUser.getId(), holder.userLastMessageTextView, holder.messagesToRearImageView, holder.lastMessageTimeTextView);
 
-
     }
+
 
     @Override
     public int getItemCount() {
@@ -107,6 +111,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         showIcon = false;
         isMy = false;
         lastMessageTime = "";
+        video = false;
+        photo = false;
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
@@ -123,14 +129,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         isMy = message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId);
 
                         lastMessageTime = message.getTime();
+                        photo = message.getVideoUrl() == null;
+                        video = message.getImageUrl() == null;
                     }
                 }
                 if ("default".equals(lastMess)) {
                     lastMsg.setText("Нет сообщений");
+                    lastMsg.setTextColor(Color.BLACK);
                 } else if (lastMess instanceof String){
                     lastMsg.setText(lastMess);
-                } else {
+                    lastMsg.setTextColor(Color.BLACK);
+                } else if (photo){
                     lastMsg.setText("Фото");
+                    lastMsg.setTextColor(Color.BLUE);
+                } else if (video){
+                    lastMsg.setText("Видео");
+                    lastMsg.setTextColor(Color.BLUE);
                 }
                 if (!showIcon && isMy){
                     imageView.setVisibility(View.VISIBLE);
@@ -142,6 +156,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 showIcon = false;
                 isMy = false;
                 lastMessageTime = "";
+                photo = false;
+                video = false;
             }
 
             @Override
@@ -149,5 +165,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
             }
         });
+    }
+
+    public void sortList(){
+
     }
 }

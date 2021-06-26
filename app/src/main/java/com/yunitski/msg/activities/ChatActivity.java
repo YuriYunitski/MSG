@@ -2,37 +2,35 @@ package com.yunitski.msg.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.CheckBox;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -66,6 +64,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     DatabaseReference usersDatabaseReference;
     ChildEventListener usersChildEventListener;
     private static final int RC_IMAGE_PICKER = 123;
+    private static final int RC_VIDEO_PICKER = 128;
+    private static final int RC_FILE_PICKER = 1283;
+    private static final int RC_AUDIO_PICKER = 109;
     private FirebaseStorage storage;
     private StorageReference chatImagesStorageReference;
 
@@ -90,6 +91,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     SharedPreferences sharedPreferences;
     ArrayList<String> urisList;
+
+    AlertDialog.Builder builder;
+    AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,9 +154,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
             @Override
             public void onUserClick(int position) {
-                Intent intent = new Intent(ChatActivity.this, PhotoActivity.class);
-                intent.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
-                startActivity(intent);
+                if (msGmessageArrayList.get(position).getImageUrl() != null) {
+                    Intent intent = new Intent(ChatActivity.this, PhotoActivity.class);
+                    intent.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
+                    startActivity(intent);
+                } else {
+                    Intent intent1 = new Intent(ChatActivity.this, VideoActivity.class);
+                    intent1.putExtra("videoUrl", msGmessageArrayList.get(position).getVideoUrl());
+                    startActivity(intent1);
+                }
             }
         });
 
@@ -356,17 +366,85 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         } else if (v.getId() == R.id.addContentImageButton){
 
-            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*", "video/*"});
-            startActivityForResult(intent, RC_IMAGE_PICKER);
+            builder = new AlertDialog.Builder(ChatActivity.this);
+            builder.setCancelable(true);
+            builder.setTitle("Медиа");
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.choose_media_type_dialog, null);
+            builder.setView(view);
+            ImageButton photo = view.findViewById(R.id.photoImageButton);
+            ImageButton video = view.findViewById(R.id.videoImageButton);
+            ImageButton file = view.findViewById(R.id.fileImageButton);
+            ImageButton audio = view.findViewById(R.id.audioImageButton);
+            photo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*"});
+                    startActivityForResult(intent, RC_IMAGE_PICKER);
+
+                }
+            });
+            video.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+//                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                    intent.setType("video/*");
+//                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"video/*"});
+
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("video/*");
+                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    startActivityForResult(intent, RC_VIDEO_PICKER);
+                }
+            });
+            file.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("application/*");
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"application/*", "text/*"});
+//                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                    intent.setType("application/*");
+//                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    startActivityForResult(intent, RC_FILE_PICKER);
+                }
+            });
+            audio.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+//                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                    intent.setType("audio/*");
+//                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"audio/*"});
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("audio/*");
+                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                    startActivityForResult(intent, RC_AUDIO_PICKER);
+                }
+            });
+            builder.setNegativeButton("отмена", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            dialog = builder.create();
+            dialog.show();
         } else if (v.getId() == R.id.fabBottom){
             messageListView.setSelection(adapter.getCount() - 1);
         } else if (v.getId() == R.id.titleLinearLayout){
             Intent intent = new Intent(ChatActivity.this, RecipientProfileActivity.class);
             intent.putExtra("recipientUserName", recipientUserName);
             intent.putExtra("imageUris", urisList);
+            intent.putExtra("recipientUserAvatar", recipientUserAvatar);
             startActivity(intent);
         }
     }
@@ -396,13 +474,48 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
-                        if(downloadUri.toString().contains("image")){
-                            Toast.makeText(getApplicationContext(), "image", Toast.LENGTH_SHORT).show();
-                        } else if (downloadUri.toString().contains("video")){
-                            Toast.makeText(getApplicationContext(), "video", Toast.LENGTH_SHORT).show();
-                        }
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setImageUrl(downloadUri.toString());
+                        gmessage.setVideoUrl(null);
+                        gmessage.setName(userName);
+                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setRecipient(recipientUserId);
+                        gmessage.setTime(currentDate());
+                        gmessage.setImageWidth(600);
+
+                        messagesDatabaseReference.push().setValue(gmessage);
+                        messageListView.setSelection(adapter.getCount() - 1);
+                    } else {
+                        // Handle failures
+                        // ...
+                    }
+                }
+            });
+            dialog.dismiss();
+        } else if (requestCode == RC_VIDEO_PICKER && resultCode == RESULT_OK){
+            Uri selectedImageUri = data.getData();
+            final StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
+            UploadTask uploadTask = imageReference.putFile(selectedImageUri);
+
+            uploadTask = imageReference.putFile(selectedImageUri);
+
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    // Continue with the task to get the download URL
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        MSGmessage gmessage = new MSGmessage();
+                        gmessage.setVideoUrl(downloadUri.toString());
+                        gmessage.setImageUrl(null);
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);
@@ -415,6 +528,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             });
+            dialog.dismiss();
         }
     }
 

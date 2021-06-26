@@ -8,11 +8,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.ImageAdapter;
 import com.yunitski.msg.data.ImagesInProfile;
@@ -20,7 +25,7 @@ import com.yunitski.msg.data.ImagesInProfile;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class RecipientProfileActivity extends AppCompatActivity {
+public class RecipientProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
     TextView userNameRecipientProfileTextView;
     ArrayList<String> urisList;
@@ -28,6 +33,8 @@ public class RecipientProfileActivity extends AppCompatActivity {
     ArrayList<ImagesInProfile> imagesInProfileArrayList;
     ImageAdapter adapter;
     RecyclerView r;
+    ImageView recipientUserAvatar;
+    ImageButton recipientImageButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +42,14 @@ public class RecipientProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recipient_profile);
         r = findViewById(R.id.imagesRecyclerView);
         userNameRecipientProfileTextView = findViewById(R.id.userNameRecipientProfileTextView);
+        recipientUserAvatar = findViewById(R.id.recipientProfileImageView);
+        recipientImageButton = findViewById(R.id.recipientImageButton);
+        recipientImageButton.setOnClickListener(this);
         Intent intent = getIntent();
         urisList = intent.getStringArrayListExtra("imageUris");
         userNameRecipientProfileTextView.setText(intent.getStringExtra("recipientUserName"));
+        //Picasso.get().load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
+        Glide.with(recipientUserAvatar).load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
         imagesInProfileArrayList = new ArrayList<>();
         Collections.reverse(urisList);
         for (int i = 0; i<urisList.size(); i++){
@@ -66,5 +78,13 @@ public class RecipientProfileActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+
+        if (v.getId() == R.id.recipientImageButton){
+            RecipientProfileActivity.this.finish();
+        }
     }
 }

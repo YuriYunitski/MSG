@@ -7,24 +7,26 @@
     android:scrollbars="horizontal"
     tools:context=".activities.RecipientProfileActivity">
 
+
     <TextView
         android:id="@+id/userNameRecipientProfileTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="8dp"
         android:text="TextView"
         android:textColor="@color/black"
         android:textSize="@dimen/_16sdp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@+id/recipientProfileImageView" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/imagesRecyclerView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
@@ -53,60 +55,11 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/photoTextView"
+                    android:id="@+id/mediaTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Фотографии"
-                    android:textSize="@dimen/_12sdp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameRecipientProfileTextView" />
-
-
-                <TextView
-                    android:id="@+id/videoTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Видеозаписи"
-                    android:textSize="@dimen/_12sdp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameRecipientProfileTextView" />
-
-
-                <TextView
-                    android:id="@+id/audioTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Аудиозаписи"
-                    android:textSize="@dimen/_12sdp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameRecipientProfileTextView" />
-
-
-                <TextView
-                    android:id="@+id/fileTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Файлы"
-                    android:textSize="@dimen/_12sdp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameRecipientProfileTextView" />
-
-
-                <TextView
-                    android:id="@+id/referenceView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="Ссылки"
-                    android:paddingEnd="@dimen/_4sdp"
+                    android:text="Медиа"
                     android:textSize="@dimen/_12sdp"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
@@ -120,6 +73,27 @@
 
     </HorizontalScrollView>
 
+    <ImageView
+        android:id="@+id/recipientProfileImageView"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="@dimen/_150sdp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_person_24"
+        tools:ignore="VectorDrawableCompat" />
+
+    <ImageButton
+        android:id="@+id/recipientImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24"
+        tools:ignore="VectorDrawableCompat"
+        android:background="@drawable/button_background"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
