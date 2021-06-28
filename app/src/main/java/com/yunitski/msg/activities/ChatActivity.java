@@ -61,7 +61,7 @@ import java.util.List;
 import static com.yunitski.msg.activities.UserListActivity.CHANNEL_ID;
 import static com.yunitski.msg.activities.UserListActivity.NOTIFICATION_ID;
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener, MSGAdapter.MessageAdapterListener {
 
     private ListView messageListView;
     private MSGAdapter adapter;
@@ -109,6 +109,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private MediaPlayer mediaPlayer;
     private boolean isPlay;
+
+    private boolean actSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,6 +252,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         usersDatabaseReference.addChildEventListener(usersChildEventListener);
+        actSound = false;
         messagesChildEventListener = new ChildEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -298,7 +301,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
 
-
             }
 
             @Override
@@ -338,7 +340,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-        registerForContextMenu(messageListView);
+        //registerForContextMenu(messageListView);
     }
 
 
@@ -352,32 +354,36 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         editor.apply();
     }
 
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        actSound = true;
+//    }
 
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        int pos = adapter.getPositionList();
-
-        FirebaseDatabase  database = FirebaseDatabase.getInstance();
-        DatabaseReference mDatabaseRef = database.getReference();
-
-        if (msGmessageArrayList.get(pos).isMine()){
-
-            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).removeValue();
-
-        } else {
-
-            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).child("deleted").setValue(true);
-
-        }
-        msGmessageArrayList.remove(pos);
-        adapter.clear();
-        adapter.addAll(msGmessageArrayList);
-        adapter.notifyDataSetChanged();
-
-        return super.onContextItemSelected(item);
-
-    }
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        int pos = adapter.getPositionList();
+//
+//        FirebaseDatabase  database = FirebaseDatabase.getInstance();
+//        DatabaseReference mDatabaseRef = database.getReference();
+//
+//        if (msGmessageArrayList.get(pos).isMine()){
+//
+//            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).removeValue();
+//
+//        } else {
+//
+//            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).child("deleted").setValue(true);
+//
+//        }
+//        msGmessageArrayList.remove(pos);
+//        adapter.clear();
+//        adapter.addAll(msGmessageArrayList);
+//        adapter.notifyDataSetChanged();
+//
+//        return super.onContextItemSelected(item);
+//
+//    }
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();
@@ -652,5 +658,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    @Override
+    public void onMessageSelected(MSGmessage msGmessage) {
+
     }
 }
