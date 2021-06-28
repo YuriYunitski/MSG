@@ -61,7 +61,7 @@ import java.util.List;
 import static com.yunitski.msg.activities.UserListActivity.CHANNEL_ID;
 import static com.yunitski.msg.activities.UserListActivity.NOTIFICATION_ID;
 
-public class ChatActivity extends AppCompatActivity implements View.OnClickListener, MSGAdapter.MessageAdapterListener {
+public class ChatActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ListView messageListView;
     private MSGAdapter adapter;
@@ -109,8 +109,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private MediaPlayer mediaPlayer;
     private boolean isPlay;
-
-    private boolean actSound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,31 +169,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
         messageListView.setStackFromBottom(true);
         adapter.notifyDataSetChanged();
-        adapter.setOnPhotoClickListener(new MSGAdapter.OnPhotoClickListener() {
-            @Override
-            public void onUserClick(int position) {
-                if (msGmessageArrayList.get(position).getImageUrl() != null && msGmessageArrayList.get(position).getAudioUrl() == null) {
-                    Intent intent = new Intent(ChatActivity.this, PhotoActivity.class);
-                    intent.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
-                    startActivity(intent);
-                } else if (msGmessageArrayList.get(position).getVideoUrl() != null  && msGmessageArrayList.get(position).getAudioUrl() == null){
-                    Intent intent1 = new Intent(ChatActivity.this, VideoActivity.class);
-                    intent1.putExtra("videoUrl", msGmessageArrayList.get(position).getVideoUrl());
-                    startActivity(intent1);
-                } else if (msGmessageArrayList.get(position).getAudioUrl() != null ){
+        adapter.setOnPhotoClickListener(position -> {
+            if (msGmessageArrayList.get(position).getImageUrl() != null && msGmessageArrayList.get(position).getAudioUrl() == null) {
+                Intent intent12 = new Intent(ChatActivity.this, PhotoActivity.class);
+                intent12.putExtra("photoUrl", msGmessageArrayList.get(position).getImageUrl());
+                startActivity(intent12);
+            } else if (msGmessageArrayList.get(position).getVideoUrl() != null  && msGmessageArrayList.get(position).getAudioUrl() == null){
+                Intent intent1 = new Intent(ChatActivity.this, VideoActivity.class);
+                intent1.putExtra("videoUrl", msGmessageArrayList.get(position).getVideoUrl());
+                startActivity(intent1);
+            } else if (msGmessageArrayList.get(position).getAudioUrl() != null ){
 //                    FirebaseDatabase  database = FirebaseDatabase.getInstance();
 //                    DatabaseReference mDatabaseRef = database.getReference();
 //                    mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioPlaying").setValue(true);
-                    if (!isPlay){
-                        mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-                        mediaPlayer.start();
-                        msGmessageArrayList.get(position).setAudioPlaying(true);
-                        isPlay = true;
-                    } else {
-                        mediaPlayer.pause();
-                        msGmessageArrayList.get(position).setAudioPlaying(false);
-                        isPlay = false;
-                    }
+                if (!isPlay){
+                    mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
+                    mediaPlayer.start();
+                    msGmessageArrayList.get(position).setAudioPlaying(true);
+                    isPlay = true;
+                } else {
+                    mediaPlayer.pause();
+                    msGmessageArrayList.get(position).setAudioPlaying(false);
+                    isPlay = false;
                 }
             }
         });
@@ -252,7 +247,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         };
         usersDatabaseReference.addChildEventListener(usersChildEventListener);
-        actSound = false;
         messagesChildEventListener = new ChildEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
@@ -353,37 +347,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         editor.putBoolean("isActive", false);
         editor.apply();
     }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        actSound = true;
-//    }
-
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//        int pos = adapter.getPositionList();
-//
-//        FirebaseDatabase  database = FirebaseDatabase.getInstance();
-//        DatabaseReference mDatabaseRef = database.getReference();
-//
-//        if (msGmessageArrayList.get(pos).isMine()){
-//
-//            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).removeValue();
-//
-//        } else {
-//
-//            mDatabaseRef.child("messages").child(msGmessageArrayList.get(pos).getPusId()).child("deleted").setValue(true);
-//
-//        }
-//        msGmessageArrayList.remove(pos);
-//        adapter.clear();
-//        adapter.addAll(msGmessageArrayList);
-//        adapter.notifyDataSetChanged();
-//
-//        return super.onContextItemSelected(item);
-//
-//    }
 
     private String currentDate(){
         Calendar calendar = new GregorianCalendar();
@@ -658,10 +621,5 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
-    }
-
-    @Override
-    public void onMessageSelected(MSGmessage msGmessage) {
-
     }
 }

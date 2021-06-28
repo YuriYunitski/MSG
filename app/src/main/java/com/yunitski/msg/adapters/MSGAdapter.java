@@ -1,37 +1,24 @@
 package com.yunitski.msg.adapters;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.TextView;
-import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.dynamicanimation.animation.SpringAnimation;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.ViewTarget;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.squareup.picasso.Picasso;
 import com.yunitski.msg.R;
 import com.yunitski.msg.data.MSGmessage;
 
@@ -40,11 +27,11 @@ import java.util.List;
 
 public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
-    private List<MSGmessage> gmessages;
+    private final List<MSGmessage> gmessages;
 
-    private Activity activity;
+    private final Activity activity;
     private OnPhotoClickListener listener;
-    private List<MSGmessage> selectedList = new ArrayList<>();
+    private final List<MSGmessage> selectedList = new ArrayList<>();
     private List<MSGmessage> filteredList = new ArrayList<>();
 
     private boolean multiSelect = false;
@@ -57,7 +44,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         filteredList.addAll(gmessages);
     }
 
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+    private final ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             multiSelect = true;
@@ -67,13 +54,18 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+
+//            if (selectedList.size() == 0){
+//                mode.finish();
+//            }
             return false;
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             for (MSGmessage msGmessage : selectedList){
-                int pos = getPosition(msGmessage);
+
+        int pos = getPosition(msGmessage);
         FirebaseDatabase  database = FirebaseDatabase.getInstance();
         DatabaseReference mDatabaseRef = database.getReference();
         if (gmessages.get(pos).isMine()){
@@ -117,7 +109,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         LayoutInflater layoutInflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
         MSGmessage msGmessage = getItem(position);
-        int layoutResource = 0;
+        int layoutResource;
         int viewType = getItemViewType(position);
 
         if (viewType == 0){
@@ -159,9 +151,11 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
     }
 
     private class ViewHolder{
-        private TextView messageTextView, messageTimeTextView;
-        private ImageView photoImageView, audioImageView;
-        private LinearLayout messageLinearLayout;
+        private final TextView messageTextView;
+        private final TextView messageTimeTextView;
+        private final ImageView photoImageView;
+        private final ImageView audioImageView;
+        private final LinearLayout messageLinearLayout;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
@@ -225,13 +219,6 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 photoImageView.setVisibility(View.GONE);
                 audioImageView.setVisibility(View.VISIBLE);
                 messageTimeTextView.setText(msGmessage.getTime());
-                audioImageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = getPosition(msGmessage);
-                        listener.onUserClick(position);
-                    }
-                });
                 if (!msGmessage.isAudioPlaying()){
                     audioImageView.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                 } else {
@@ -252,32 +239,41 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                     messageLinearLayout.setBackgroundResource(R.drawable.message_income_new);
                 }
             }
-            messageLinearLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+            messageLinearLayout.setOnLongClickListener(v -> {
+                ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(msGmessage);
+                return true;
+            });
+            messageLinearLayout.setOnClickListener(v -> {
+                if (multiSelect){
                     selectItem(msGmessage);
-                    return true;
                 }
             });
-            messageLinearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (multiSelect){
-                        selectItem(msGmessage);
-                    }
+            photoImageView.setOnClickListener(v -> {
+                if (multiSelect){
+                    selectItem(msGmessage);
+                } else {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
                 }
             });
-            photoImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (multiSelect){
-                        selectItem(msGmessage);
-                    } else {
-                        int position = getPosition(msGmessage);
-                        listener.onUserClick(position);
-                    }
+            photoImageView.setOnLongClickListener(v -> {
+                ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(msGmessage);
+                return true;
+            });
+            audioImageView.setOnClickListener(v -> {
+                if (multiSelect){
+                    selectItem(msGmessage);
+                } else {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
                 }
+            });
+            audioImageView.setOnLongClickListener(v -> {
+                ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(msGmessage);
+                return true;
             });
         }
     }
@@ -287,7 +283,4 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         return gmessages.size();
     }
 
-    public interface MessageAdapterListener{
-        void onMessageSelected(MSGmessage msGmessage);
-    }
 }

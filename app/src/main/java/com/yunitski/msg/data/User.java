@@ -4,7 +4,6 @@ public class User {
     private String name;
     private String email;
     private String id;
-    private int avatarMockupResource;
     private String lastMessage;
     private String profilePhotoUrl;
     private String pushId;
@@ -13,11 +12,10 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email, String id, int avatarMockupResource, String lastMessage, String profilePhotoUrl, String pushId, String password) {
+    public User(String name, String email, String id, String lastMessage, String profilePhotoUrl, String pushId, String password) {
         this.name = name;
         this.email = email;
         this.id = id;
-        this.avatarMockupResource = avatarMockupResource;
         this.lastMessage = lastMessage;
         this.profilePhotoUrl = profilePhotoUrl;
         this.pushId = pushId;
@@ -46,14 +44,6 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public int getAvatarMockupResource() {
-        return avatarMockupResource;
-    }
-
-    public void setAvatarMockupResource(int avatarMockupResource) {
-        this.avatarMockupResource = avatarMockupResource;
     }
 
     public String getLastMessage() {
