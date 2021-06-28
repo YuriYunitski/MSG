@@ -2,16 +2,25 @@ package com.yunitski.msg.activities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,6 +64,8 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     private String userName;
     public final static String CHANNEL_ID = "new_message_notification";
     public final static int NOTIFICATION_ID = 78;
+    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences2;
 
 
     @Override
@@ -85,29 +96,45 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         attachUserDatabaseReferenceListener();
         
         buildRecyclerView();
-//        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
-//        reference.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-////                    if (!message.getSender().equals(auth.getCurrentUser().getUid())
-////                            && !message.getRecipient().equals(firebaseUser.getUid()) && message.getRecipient().equals(auth.getCurrentUser().getUid())
-////                            && message.getSender().equals(firebaseUser.getUid()) && !message.isDeleted())
-//                    if (message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(auth.getCurrentUser()) && !message.isDeleted() ||
-//                            message.getRecipient().equals(auth.getCurrentUser()) && message.getSender().equals(firebaseUser.getUid()) && !message.isDeleted())
-//                    {
-//                        Toast.makeText(getApplicationContext(), "nm", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+
+        sharedPreferences = getSharedPreferences("isActiveList", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isActiveList", true);
+        editor.apply();
+        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
+        reference.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
+                    if (!message.getSender().equals(firebaseUser.getUid()) && !message.isRead() ) {
+                        sharedPreferences = getSharedPreferences("isActiveList", Context.MODE_PRIVATE);
+                        sharedPreferences2 = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+                        boolean isA = sharedPreferences.getBoolean("isActiveList", true) && !sharedPreferences2.getBoolean("isActive", true);
+                        if (isA){
+                            createNotification();
+                            addNotification(message.getText(), message.getName());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sharedPreferences = getSharedPreferences("isActiveList", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean("isActiveList", false);
+        editor.apply();
     }
 
     private void attachUserDatabaseReferenceListener() {
@@ -205,5 +232,29 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void createNotification(){
+        CharSequence name = "New Message";
+        String desc = "Message";
+        NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH);
+        notificationChannel.setDescription(desc);
+        NotificationManager notificationManager = (NotificationManager)getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel);
+    }
+
+    private void addNotification(String message, String userName){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
+//        Intent intent = new Intent(this, UserListActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(userName)
+//                .setContentIntent(pendingIntent)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH);
+        NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+        notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
     }
 }
