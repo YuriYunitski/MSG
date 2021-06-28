@@ -43,6 +43,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     private boolean photo;
     private boolean audio;
 
+    private int position;
+    public int getPos(){
+        return position;
+    }
+
 
     public interface OnUserClickListener{
         void onUserClick(int position);

@@ -16,15 +16,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.UserAdapter;
 import com.yunitski.msg.data.MSGmessage;
@@ -42,6 +45,8 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     private RecyclerView userRecyclerView;
     private UserAdapter userAdapter;
     private RecyclerView.LayoutManager userLayoutManager;
+
+    private String recipientId;
 
     private Toolbar toolbar;
 
@@ -80,6 +85,29 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         attachUserDatabaseReferenceListener();
         
         buildRecyclerView();
+//        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+//        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
+//        reference.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
+////                    if (!message.getSender().equals(auth.getCurrentUser().getUid())
+////                            && !message.getRecipient().equals(firebaseUser.getUid()) && message.getRecipient().equals(auth.getCurrentUser().getUid())
+////                            && message.getSender().equals(firebaseUser.getUid()) && !message.isDeleted())
+//                    if (message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(auth.getCurrentUser()) && !message.isDeleted() ||
+//                            message.getRecipient().equals(auth.getCurrentUser()) && message.getSender().equals(firebaseUser.getUid()) && !message.isDeleted())
+//                    {
+//                        Toast.makeText(getApplicationContext(), "nm", Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
     private void attachUserDatabaseReferenceListener() {
