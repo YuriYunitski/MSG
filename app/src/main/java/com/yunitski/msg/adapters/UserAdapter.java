@@ -41,6 +41,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
 
     private boolean video;
     private boolean photo;
+    private boolean audio;
 
 
     public interface OnUserClickListener{
@@ -113,6 +114,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         lastMessageTime = "";
         video = false;
         photo = false;
+        audio = false;
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
@@ -129,8 +131,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         isMy = message.getRecipient().equals(firebaseUser.getUid()) && message.getSender().equals(userId);
 
                         lastMessageTime = message.getTime();
-                        photo = message.getVideoUrl() == null;
-                        video = message.getImageUrl() == null;
+                        photo = message.getImageUrl() != null;
+                        video = message.getVideoUrl() != null;
+                        audio = message.getAudioUrl() != null;
                     }
                 }
                 if ("default".equals(lastMess)) {
@@ -145,6 +148,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 } else if (video){
                     lastMsg.setText("Видео");
                     lastMsg.setTextColor(Color.BLUE);
+                } else if (audio){
+                    lastMsg.setText("Аудио");
+                    lastMsg.setTextColor(Color.BLUE);
                 }
                 if (!showIcon && isMy){
                     imageView.setVisibility(View.VISIBLE);
@@ -158,6 +164,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 lastMessageTime = "";
                 photo = false;
                 video = false;
+                audio = false;
             }
 
             @Override

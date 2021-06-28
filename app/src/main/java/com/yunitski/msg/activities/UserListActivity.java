@@ -48,6 +48,8 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     private FirebaseAuth auth;
 
     private String userName;
+    public final static String CHANNEL_ID = "new_message_notification";
+    public final static int NOTIFICATION_ID = 78;
 
 
     @Override

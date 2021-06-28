@@ -13,11 +13,13 @@ public class MSGmessage {
     private boolean isRead;
     private String videoUrl;
     private int imageWidth;
+    private String audioUrl;
+    private boolean isAudioPlaying;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, int imageWidth) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, int imageWidth, String audioUrl, boolean isAudioPlaying) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -30,6 +32,8 @@ public class MSGmessage {
         this.isRead = isRead;
         this.videoUrl = videoUrl;
         this.imageWidth = imageWidth;
+        this.audioUrl = audioUrl;
+        this.isAudioPlaying = isAudioPlaying;
     }
 
     public String getText() {
@@ -127,5 +131,21 @@ public class MSGmessage {
 
     public void setImageWidth(int imageWidth) {
         this.imageWidth = imageWidth;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
+    }
+
+    public boolean isAudioPlaying() {
+        return isAudioPlaying;
+    }
+
+    public void setAudioPlaying(boolean audioPlaying) {
+        isAudioPlaying = audioPlaying;
     }
 }

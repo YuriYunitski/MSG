@@ -99,16 +99,18 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
 
 //        viewHolder.selectMessageCheckBox.setVisibility(View.GONE);
-        boolean isText = msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null;
+        boolean isText = msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null && msGmessage.getAudioUrl() == null;
         if (isText){
             viewHolder.messageTextView.setVisibility(View.VISIBLE);
             viewHolder.photoImageView.setVisibility(View.GONE);
+            viewHolder.audioImageView.setVisibility(View.GONE);
             viewHolder.messageTextView.setText(msGmessage.getText());
             viewHolder.messageTimeTextView.setText(msGmessage.getTime());
-        } else if (msGmessage.getVideoUrl() == null){
+        } else if (msGmessage.getVideoUrl() == null && msGmessage.getAudioUrl() == null){
 
             viewHolder.messageTextView.setVisibility(View.GONE);
             viewHolder.photoImageView.setVisibility(View.VISIBLE);
+            viewHolder.audioImageView.setVisibility(View.GONE);
 //            if (viewHolder.photoImageView.getLayoutParams().width < 900){
 //                viewHolder.photoImageView.getLayoutParams().width = 500;
 //            }
@@ -138,11 +140,12 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 //                    return true;
 //                }
 //            });
-        } else if (msGmessage.getImageUrl() == null){
+        } else if (msGmessage.getImageUrl() == null && msGmessage.getAudioUrl() == null){
 
             viewHolder.messageTextView.setVisibility(View.VISIBLE);
             viewHolder.messageTextView.setText("ᐅ");
             viewHolder.photoImageView.setVisibility(View.VISIBLE);
+            viewHolder.audioImageView.setVisibility(View.GONE);
             Glide.with(viewHolder.photoImageView.getContext()).load(msGmessage.getVideoUrl()).into(viewHolder.photoImageView);
             viewHolder.photoImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -152,7 +155,25 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 }
             });
             viewHolder.messageTimeTextView.setText(msGmessage.getTime());
+        } else if (msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null){
+
+            viewHolder.messageTextView.setVisibility(View.GONE);
+            viewHolder.photoImageView.setVisibility(View.GONE);
+            viewHolder.audioImageView.setVisibility(View.VISIBLE);
+            viewHolder.messageTimeTextView.setText(msGmessage.getTime());
+            viewHolder.audioImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
+                }
+            });
+        if (!msGmessage.isAudioPlaying()){
+            viewHolder.audioImageView.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+        } else {
+            viewHolder.audioImageView.setImageResource(R.drawable.ic_baseline_pause_24);
         }
+    }
         viewHolder.messageLinearLayout.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
             @Override
             public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -199,7 +220,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
     private class ViewHolder{
         private TextView messageTextView, messageTimeTextView;
-        private ImageView photoImageView;
+        private ImageView photoImageView, audioImageView;
         private LinearLayout messageLinearLayout;
 //        private CheckBox selectMessageCheckBox;
 
@@ -208,6 +229,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             messageTextView = view.findViewById(R.id.messageTextView);
             messageTimeTextView = view.findViewById(R.id.messageTimeTextView);
             messageLinearLayout = view.findViewById(R.id.messageLinearLayout);
+            audioImageView = view.findViewById(R.id.audioImageView);
 //            selectMessageCheckBox = view.findViewById(R.id.selectMessageCheckBox);
         }
     }
