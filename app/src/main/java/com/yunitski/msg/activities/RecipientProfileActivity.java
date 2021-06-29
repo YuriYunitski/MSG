@@ -1,83 +1,77 @@
 package com.yunitski.msg.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.ImageAdapter;
+import com.yunitski.msg.adapters.VideoAdapter;
 import com.yunitski.msg.data.ImagesInProfile;
+import com.yunitski.msg.data.VideosInProfile;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class RecipientProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextView userNameRecipientProfileTextView;
+    TextView userNameRecipientProfileTextView, photoTextView, videoTextView, fileTextView, audioTextView, noMediaTextView;
     ArrayList<String> urisList;
-    RecyclerView imagesRecyclerView;
+    ArrayList<String> videoUrisList;
+    ArrayList<String> audioUrisList;
     ArrayList<ImagesInProfile> imagesInProfileArrayList;
+    ArrayList<VideosInProfile> videosInProfileArrayList;
     ImageAdapter adapter;
-    RecyclerView r;
+    VideoAdapter videoAdapter;
+    RecyclerView recyclerView;
     ImageView recipientUserAvatar;
     ImageButton recipientImageButton;
+    private boolean photo, video, file, audio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipient_profile);
-        r = findViewById(R.id.imagesRecyclerView);
+        recyclerView = findViewById(R.id.imagesRecyclerView);
+        photo = true;
+        video = false;
+        file = false;
+        audio = false;
         userNameRecipientProfileTextView = findViewById(R.id.userNameRecipientProfileTextView);
         recipientUserAvatar = findViewById(R.id.recipientProfileImageView);
         recipientImageButton = findViewById(R.id.recipientImageButton);
+        photoTextView = findViewById(R.id.photoTextView);
+        videoTextView = findViewById(R.id.videoTextView);
+        fileTextView = findViewById(R.id.fileTextView);
+        audioTextView = findViewById(R.id.audioTextView);
+        noMediaTextView = findViewById(R.id.noMediaTextView);
+        photoTextView.setOnClickListener(this);
+        videoTextView.setOnClickListener(this);
+        fileTextView.setOnClickListener(this);
+        audioTextView.setOnClickListener(this);
         recipientImageButton.setOnClickListener(this);
         Intent intent = getIntent();
         urisList = intent.getStringArrayListExtra("imageUris");
+        videoUrisList = intent.getStringArrayListExtra("videosUris");
+        audioUrisList = intent.getStringArrayListExtra("audioUris");
         userNameRecipientProfileTextView.setText(intent.getStringExtra("recipientUserName"));
-        //Picasso.get().load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
         Glide.with(recipientUserAvatar).load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
-        imagesInProfileArrayList = new ArrayList<>();
-        Collections.reverse(urisList);
-        for (int i = 0; i<urisList.size(); i++){
-            imagesInProfileArrayList.add(new ImagesInProfile(urisList.get(i)));
-//            Toast.makeText(getApplicationContext(), "" + urisList.get(i), Toast.LENGTH_SHORT).show();
-            Log.d("imagesLog", "img: " + urisList.get(i));
-        }
-//        ImagesInProfile imagesInProfile = new ImagesInProfile("https://firebasestorage.googleapis.com/v0/b/mcgmessenger-26c67.appspot.com/o/chat_images%2Fimage%3A4899?alt=media&token=db19972a-b5d7-4280-bf2a-fe65dc0a11d9", "https://firebasestorage.googleapis.com/v0/b/mcgmessenger-26c67.appspot.com/o/chat_images%2Fimage%3A4899?alt=media&token=db19972a-b5d7-4280-bf2a-fe65dc0a11d9");
-//
-//        imagesInProfileArrayList.add(imagesInProfile);
-
-        LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
-
-//        r.addItemDecoration(new DividerItemDecoration(
-//                r.getContext(), DividerItemDecoration.HORIZONTAL));
-        r.setHasFixedSize(true);
-        r.setLayoutManager(layoutManager);
-        adapter = new ImageAdapter( imagesInProfileArrayList);
-        r.setAdapter(adapter);
-
-        adapter.setOnImageClickListener(new ImageAdapter.OnImageClickListener() {
-            @Override
-            public void onImageClick(int position) {
-                Intent intent = new Intent(RecipientProfileActivity.this, PhotoActivity.class);
-                intent.putExtra("photoUrl", imagesInProfileArrayList.get(position).getImageUrl());
-                startActivity(intent);
-            }
-        });
+        photoTextView.setTextColor(Color.BLACK);
+        videoTextView.setTextColor(Color.LTGRAY);
+        fileTextView.setTextColor(Color.LTGRAY);
+        audioTextView.setTextColor(Color.LTGRAY);
+        updateUI();
     }
 
     @Override
@@ -85,6 +79,105 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
 
         if (v.getId() == R.id.recipientImageButton){
             RecipientProfileActivity.this.finish();
+        } else if (v.getId() == R.id.photoTextView){
+            photoTextView.setTextColor(Color.BLACK);
+            videoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.LTGRAY);
+            photo = true;
+            video = false;
+            file = false;
+            audio = false;
+            updateUI();
+        } else if (v.getId() == R.id.videoTextView){
+            photoTextView.setTextColor(Color.LTGRAY);
+            videoTextView.setTextColor(Color.BLACK);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.LTGRAY);
+            photo = false;
+            video = true;
+            file = false;
+            audio = false;
+            updateUI();
+        } else if (v.getId() == R.id.fileTextView){
+            photoTextView.setTextColor(Color.LTGRAY);
+            videoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.BLACK);
+            audioTextView.setTextColor(Color.LTGRAY);
+            photo = false;
+            video = false;
+            file = true;
+            audio = false;
+            updateUI();
+        } else if (v.getId() == R.id.audioTextView){
+            photoTextView.setTextColor(Color.LTGRAY);
+            videoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.BLACK);
+            photo = false;
+            video = false;
+            file = false;
+            audio = true;
+            updateUI();
         }
+    }
+
+    private void updateUI(){
+        if (photo && !video && !file && !audio){
+            if (urisList.size() == 0){
+                noMediaTextView.setText("Нет фотографий");
+            }
+            imagesInProfileArrayList = new ArrayList<>();
+            Collections.reverse(urisList);
+            for (int i = 0; i<urisList.size(); i++){
+                imagesInProfileArrayList.add(new ImagesInProfile(urisList.get(i)));
+            }
+
+            LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            adapter = new ImageAdapter( imagesInProfileArrayList);
+            recyclerView.setAdapter(adapter);
+
+            adapter.setOnImageClickListener(new ImageAdapter.OnImageClickListener() {
+                @Override
+                public void onImageClick(int position) {
+                    Intent intent = new Intent(RecipientProfileActivity.this, PhotoActivity.class);
+                    intent.putExtra("photoUrl", imagesInProfileArrayList.get(position).getImageUrl());
+                    startActivity(intent);
+                }
+            });
+        } else if (!photo && video && !file && !audio){
+            if (videoUrisList.size() == 0){
+            noMediaTextView.setText("Нет видео");
+        }
+
+            videosInProfileArrayList = new ArrayList<>();
+            Collections.reverse(videoUrisList);
+            for (int i = 0; i < videoUrisList.size(); i++){
+                videosInProfileArrayList.add(new VideosInProfile(videoUrisList.get(i)));
+            }
+
+            LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            videoAdapter = new VideoAdapter(videosInProfileArrayList);
+            recyclerView.setAdapter(videoAdapter);
+
+            videoAdapter.setOnVideoClickListener(new VideoAdapter.OnVideoClickListener() {
+                @Override
+                public void onVideoClick(int position) {
+                    Intent intent = new Intent(RecipientProfileActivity.this, VideoActivity.class);
+                    intent.putExtra("videoUrl", videosInProfileArrayList.get(position).getVideoUrl());
+                    startActivity(intent);
+                }
+            });
+        } else if (!photo && !video && file && !audio){
+
+        } else if (!photo && !video && !file && audio){
+
+        }
+
+
     }
 }

@@ -87,7 +87,7 @@
         android:id="@+id/addContentImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="#DFDFDF"
+        android:background="@drawable/button_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/messageEditText"
@@ -100,7 +100,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="#DFDFDF"
+        android:background="@drawable/button_background"
         app:layout_constraintTop_toTopOf="@+id/messageEditText"
         app:srcCompat="@drawable/ic_baseline_send_24"
         tools:ignore="VectorDrawableCompat" />

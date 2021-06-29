@@ -1,6 +1,9 @@
 package com.yunitski.msg.adapters;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.appwidget.AppWidgetHost;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.appcompat.view.menu.MenuView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DatabaseReference;
@@ -31,9 +35,12 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
     private final Activity activity;
     private OnPhotoClickListener listener;
+    private OnAudioClickListener audioClickListener;
     private final List<MSGmessage> selectedList = new ArrayList<>();
     private List<MSGmessage> filteredList = new ArrayList<>();
 
+    ImageView playImageView;
+    ImageView stopImageView;
     private boolean multiSelect = false;
 
 
@@ -63,22 +70,37 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            for (MSGmessage msGmessage : selectedList){
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Удалить сообщения?");
+            builder.setCancelable(false);
+            builder.setPositiveButton("да", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    for (MSGmessage msGmessage : selectedList){
 
-        int pos = getPosition(msGmessage);
-        FirebaseDatabase  database = FirebaseDatabase.getInstance();
-        DatabaseReference mDatabaseRef = database.getReference();
-        if (gmessages.get(pos).isMine()){
-            mDatabaseRef.child("messages").child(gmessages.get(pos).getPusId()).removeValue();
-        } else {
+                        int pos = getPosition(msGmessage);
+                        FirebaseDatabase  database = FirebaseDatabase.getInstance();
+                        DatabaseReference mDatabaseRef = database.getReference();
+                        if (gmessages.get(pos).isMine()){
+                            mDatabaseRef.child("messages").child(gmessages.get(pos).getPusId()).removeValue();
+                        } else {
 
-            mDatabaseRef.child("messages").child(gmessages.get(pos).getPusId()).child("deleted").setValue(true);
+                            mDatabaseRef.child("messages").child(gmessages.get(pos).getPusId()).child("deleted").setValue(true);
 
-        }
-                gmessages.remove(pos);
-            }
-            notifyDataSetChanged();
-            mode.finish();
+                        }
+                        gmessages.remove(pos);
+                    }
+                    notifyDataSetChanged();
+                    mode.finish();
+                }
+            });
+            builder.setNegativeButton("отмена", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.create().show();
             return true;
         }
 
@@ -98,6 +120,14 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
     public void setOnPhotoClickListener(OnPhotoClickListener listener){
         this.listener = listener;
+    }
+
+    public interface OnAudioClickListener{
+        void onAudioClick(int position, ImageView view);
+    }
+
+    public void setOnAudioClickListener(OnAudioClickListener audioClickListener){
+        this.audioClickListener = audioClickListener;
     }
 
 
@@ -173,7 +203,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
                     selectedList.remove(msGmessage);
                     if (getItemViewType(getPosition(msGmessage)) == 0) {
-                        messageLinearLayout.setBackgroundResource(R.drawable.message_outcome_new);
+                        messageLinearLayout.setBackgroundResource(R.drawable.out_mess_var2);
                     } else {
                         messageLinearLayout.setBackgroundResource(R.drawable.message_income_new);
                     }
@@ -197,7 +227,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 audioImageView.setVisibility(View.GONE);
                 messageTextView.setText(msGmessage.getText());
                 messageTimeTextView.setText(msGmessage.getTime());
-            } else if (msGmessage.getVideoUrl() == null && msGmessage.getAudioUrl() == null){
+            } else if (msGmessage.getImageUrl() != null){
 
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.VISIBLE);
@@ -205,7 +235,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 Glide.with(photoImageView.getContext()).asBitmap().load(msGmessage.getImageUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
 
-            } else if (msGmessage.getImageUrl() == null && msGmessage.getAudioUrl() == null){
+            } else if (msGmessage.getVideoUrl() != null){
 
                 messageTextView.setVisibility(View.VISIBLE);
                 messageTextView.setText("ᐅ");
@@ -213,17 +243,17 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 audioImageView.setVisibility(View.GONE);
                 Glide.with(photoImageView.getContext()).load(msGmessage.getVideoUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
-            } else if (msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null){
+            } else if (msGmessage.getAudioUrl() != null){
 
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.GONE);
                 audioImageView.setVisibility(View.VISIBLE);
                 messageTimeTextView.setText(msGmessage.getTime());
-                if (!msGmessage.isAudioPlaying()){
-                    audioImageView.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                } else {
-                    audioImageView.setImageResource(R.drawable.ic_baseline_pause_24);
-                }
+//                if (!msGmessage.isAudioPlaying()){
+//                    audioImageView.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+//                } else {
+//                    audioImageView.setImageResource(R.drawable.ic_baseline_pause_24);
+//                }
             }
             if (selectedList.contains(msGmessage)){
 
@@ -234,7 +264,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 }
             } else {
                 if (getItemViewType(getPosition(msGmessage)) == 0) {
-                    messageLinearLayout.setBackgroundResource(R.drawable.message_outcome_new);
+                    messageLinearLayout.setBackgroundResource(R.drawable.out_mess_var2);
                 } else {
                     messageLinearLayout.setBackgroundResource(R.drawable.message_income_new);
                 }
@@ -267,7 +297,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                     selectItem(msGmessage);
                 } else {
                     int position = getPosition(msGmessage);
-                    listener.onUserClick(position);
+                    audioClickListener.onAudioClick(position, audioImageView);
+
                 }
             });
             audioImageView.setOnLongClickListener(v -> {
@@ -276,7 +307,11 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 return true;
             });
         }
+
     }
+
+
+
 
     @Override
     public int getCount() {

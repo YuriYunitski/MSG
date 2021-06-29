@@ -55,15 +55,41 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/mediaTextView"
+                    android:id="@+id/photoTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:text="Медиа"
+                    android:padding="10dp"
+                    android:text="Фото"
                     android:textSize="@dimen/_12sdp"
-                    android:textColor="@color/black"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userNameRecipientProfileTextView" />
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/videoTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Видео"
+                    android:textSize="@dimen/_12sdp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/fileTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Файлы"
+                    android:textSize="@dimen/_12sdp"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/audioTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Аудио"
+                    android:textSize="@dimen/_12sdp"
+                    android:textColor="@color/black"/>
 
 
             </LinearLayout>
@@ -94,6 +120,16 @@
         app:srcCompat="@drawable/ic_baseline_keyboard_arrow_left_24"
         tools:ignore="VectorDrawableCompat"
         android:background="@drawable/button_background"/>
+
+    <TextView
+        android:id="@+id/noMediaTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/imagesRecyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/imagesRecyclerView"
+        app:layout_constraintStart_toStartOf="@+id/imagesRecyclerView"
+        app:layout_constraintTop_toTopOf="@+id/imagesRecyclerView" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

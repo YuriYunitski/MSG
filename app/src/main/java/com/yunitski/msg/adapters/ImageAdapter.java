@@ -49,7 +49,8 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ImageAdapter.ViewHolder holder, int position) {
 
         ImagesInProfile imagesInProfile = imagesInProfileList.get(position);
-        Picasso.get().load(imagesInProfile.getImageUrl()).into(holder.imageView);
+        //Picasso.get().load(imagesInProfile.getImageUrl()).into(holder.imageView);
+        Glide.with(holder.imageView).load(imagesInProfile.getImageUrl()).into(holder.imageView);
 
     }
 

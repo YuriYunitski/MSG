@@ -103,6 +103,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     SharedPreferences sharedPreferences;
     ArrayList<String> urisList;
+    ArrayList<String> videoUrisList;
+    ArrayList<String> audioUrisList;
 
     AlertDialog.Builder builder;
     AlertDialog dialog;
@@ -142,6 +144,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
 
         urisList = new ArrayList<>();
+        videoUrisList = new ArrayList<>();
+        audioUrisList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
         sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -178,18 +182,18 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent1 = new Intent(ChatActivity.this, VideoActivity.class);
                 intent1.putExtra("videoUrl", msGmessageArrayList.get(position).getVideoUrl());
                 startActivity(intent1);
-            } else if (msGmessageArrayList.get(position).getAudioUrl() != null ){
-//                    FirebaseDatabase  database = FirebaseDatabase.getInstance();
-//                    DatabaseReference mDatabaseRef = database.getReference();
-//                    mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioPlaying").setValue(true);
+            }
+        });
+        adapter.setOnAudioClickListener((position, view) -> {
+            if (msGmessageArrayList.get(position).getAudioUrl() != null){
                 if (!isPlay){
                     mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
                     mediaPlayer.start();
-                    msGmessageArrayList.get(position).setAudioPlaying(true);
+                    view.setBackgroundResource(R.drawable.ic_baseline_pause_24);
                     isPlay = true;
                 } else {
-                    mediaPlayer.pause();
-                    msGmessageArrayList.get(position).setAudioPlaying(false);
+                    mediaPlayer.stop();
+                    view.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24);
                     isPlay = false;
                 }
             }
@@ -261,6 +265,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     adapter.add(message);
                     if (message.getImageUrl() != null){
                         urisList.add(message.getImageUrl());
+                    } else if (message.getVideoUrl() != null){
+                        videoUrisList.add(message.getVideoUrl());
+                    } else if (message.getAudioUrl() != null){
+                        audioUrisList.add(message.getAudioUrl());
                     }
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
@@ -271,6 +279,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     adapter.add(message);
                     if (message.getImageUrl() != null){
                         urisList.add(message.getImageUrl());
+                    } else if (message.getVideoUrl() != null){
+                        videoUrisList.add(message.getVideoUrl());
+                    } else if (message.getAudioUrl() != null){
+                        audioUrisList.add(message.getAudioUrl());
                     }
                    }
                 if (!message.getSender().equals(auth.getCurrentUser().getUid())
@@ -346,6 +358,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isActive", false);
         editor.apply();
+        mediaPlayer.stop();
     }
 
     private String currentDate(){
@@ -456,6 +469,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             Intent intent = new Intent(ChatActivity.this, RecipientProfileActivity.class);
             intent.putExtra("recipientUserName", recipientUserName);
             intent.putExtra("imageUris", urisList);
+            intent.putExtra("videosUris", videoUrisList);
+            intent.putExtra("audioUris", audioUrisList);
             intent.putExtra("recipientUserAvatar", recipientUserAvatar);
             startActivity(intent);
         }
