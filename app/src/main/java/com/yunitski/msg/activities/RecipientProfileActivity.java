@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,8 +18,10 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.yunitski.msg.R;
+import com.yunitski.msg.adapters.AudioAdapter;
 import com.yunitski.msg.adapters.ImageAdapter;
 import com.yunitski.msg.adapters.VideoAdapter;
+import com.yunitski.msg.data.AudioInProfile;
 import com.yunitski.msg.data.ImagesInProfile;
 import com.yunitski.msg.data.VideosInProfile;
 
@@ -32,12 +36,15 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
     ArrayList<String> audioUrisList;
     ArrayList<ImagesInProfile> imagesInProfileArrayList;
     ArrayList<VideosInProfile> videosInProfileArrayList;
+    ArrayList<AudioInProfile> audioInProfileArrayList;
     ImageAdapter adapter;
     VideoAdapter videoAdapter;
+    AudioAdapter audioAdapter;
     RecyclerView recyclerView;
     ImageView recipientUserAvatar;
     ImageButton recipientImageButton;
-    private boolean photo, video, file, audio;
+    private boolean photo, video, file, audio, isPlay;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +55,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         video = false;
         file = false;
         audio = false;
+        isPlay = false;
         userNameRecipientProfileTextView = findViewById(R.id.userNameRecipientProfileTextView);
         recipientUserAvatar = findViewById(R.id.recipientProfileImageView);
         recipientImageButton = findViewById(R.id.recipientImageButton);
@@ -88,6 +96,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             video = false;
             file = false;
             audio = false;
+            isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.videoTextView){
             photoTextView.setTextColor(Color.LTGRAY);
@@ -98,6 +107,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             video = true;
             file = false;
             audio = false;
+            isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.fileTextView){
             photoTextView.setTextColor(Color.LTGRAY);
@@ -108,6 +118,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             video = false;
             file = true;
             audio = false;
+            isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.audioTextView){
             photoTextView.setTextColor(Color.LTGRAY);
@@ -118,6 +129,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             video = false;
             file = false;
             audio = true;
+            isPlay = false;
             updateUI();
         }
     }
@@ -175,9 +187,54 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         } else if (!photo && !video && file && !audio){
 
         } else if (!photo && !video && !file && audio){
+            if (audioUrisList.size() == 0){
+                noMediaTextView.setText("Нет видео");
+            }
 
+            audioInProfileArrayList = new ArrayList<>();
+            Collections.reverse(audioUrisList);
+            for (int i = 0; i < audioUrisList.size(); i++){
+                audioInProfileArrayList.add(new AudioInProfile(audioUrisList.get(i)));
+            }
+
+            LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            audioAdapter = new AudioAdapter(audioInProfileArrayList);
+            recyclerView.setAdapter(audioAdapter);
+            audioAdapter.setOnVideoClickListener(new AudioAdapter.OnAudioClickListener() {
+                @Override
+                public void onAudioClick(int position, ImageView view) {
+                    if (!isPlay){
+                        mediaPlayer = MediaPlayer.create(RecipientProfileActivity.this, Uri.parse(audioInProfileArrayList.get(position).getAudioUrl()));
+                        mediaPlayer.start();
+                        view.setImageResource(R.drawable.ic_baseline_pause_24);
+                        isPlay = true;
+                    } else {
+                        mediaPlayer.stop();
+                        view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                        isPlay = false;
+                    }
+//                    Runnable task = new Runnable() {
+//                        @Override
+//                        public void run() {
+//                        }
+//                    };
+//                    Thread thread = new Thread(task);
+//                    thread.start();
+                }
+            });
         }
 
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mediaPlayer != null){
+            mediaPlayer.stop();
+            isPlay = false;
+        }
     }
 }

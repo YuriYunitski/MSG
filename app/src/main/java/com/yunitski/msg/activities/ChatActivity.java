@@ -189,11 +189,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 if (!isPlay){
                     mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
                     mediaPlayer.start();
-                    view.setBackgroundResource(R.drawable.ic_baseline_pause_24);
+                    view.setImageResource(R.drawable.ic_baseline_pause_24);
                     isPlay = true;
                 } else {
                     mediaPlayer.stop();
-                    view.setBackgroundResource(R.drawable.ic_baseline_play_arrow_24);
+                    view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                     isPlay = false;
                 }
             }
@@ -349,8 +349,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         //registerForContextMenu(messageListView);
     }
 
-
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -358,7 +356,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isActive", false);
         editor.apply();
-        mediaPlayer.stop();
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
     }
 
     private String currentDate(){
