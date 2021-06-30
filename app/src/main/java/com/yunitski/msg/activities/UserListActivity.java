@@ -101,7 +101,6 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean("isActiveList", true);
         editor.apply();
-        FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -109,7 +108,7 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-                    if (!message.getSender().equals(firebaseUser.getUid()) && !message.isRead() ) {
+                    if (!message.getSender().equals(auth.getCurrentUser().getUid()) && !message.isRead() && message.getRecipient().equals(auth.getCurrentUser().getUid())) {
                         sharedPreferences = getSharedPreferences("isActiveList", Context.MODE_PRIVATE);
                         sharedPreferences2 = getSharedPreferences("isActive", Context.MODE_PRIVATE);
                         boolean isA = sharedPreferences.getBoolean("isActiveList", true) && !sharedPreferences2.getBoolean("isActive", true);

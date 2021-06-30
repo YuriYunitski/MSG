@@ -24,7 +24,7 @@ public class DownloadingFromUrl extends AsyncTask<String, String, String> {
             InputStream input = new BufferedInputStream(url.openStream());
             OutputStream output = new FileOutputStream(Environment
                     .getExternalStorageDirectory().toString() + "/mcgMusic");
-            byte data[] = new byte[1024];
+            byte[] data = new byte[1024];
 
             long total = 0;
 
@@ -44,8 +44,6 @@ public class DownloadingFromUrl extends AsyncTask<String, String, String> {
             // closing streams
             output.close();
             input.close();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
