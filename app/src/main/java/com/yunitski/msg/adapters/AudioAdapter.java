@@ -4,6 +4,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,8 +45,9 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull AudioAdapter.ViewHolder holder, int position) {
 
-        AudioInProfile videosInProfile = audioInProfileList.get(position);
-        Glide.with(holder.imageViewAudio).load(videosInProfile.getAudioUrl()).into(holder.imageViewAudio);
+        AudioInProfile audioInProfile = audioInProfileList.get(position);
+        //Glide.with(holder.imageViewAudio).load(audioInProfile.getAudioUrl()).into(holder.imageViewAudio);
+        holder.audioNameTextView.setText(audioInProfile.getAudioName());
     }
 
     @Override
@@ -56,11 +58,13 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageViewAudio;
+        TextView audioNameTextView;
 
         public ViewHolder(@NonNull View itemView, OnAudioClickListener listener) {
             super(itemView);
 
             imageViewAudio = itemView.findViewById(R.id.audioImageView);
+            audioNameTextView = itemView.findViewById(R.id.audioNameTextView);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

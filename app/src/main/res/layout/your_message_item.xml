@@ -20,13 +20,29 @@
             android:id="@+id/photoImageView"
             android:paddingBottom="10dp"/>
 
-
-        <ImageView
+        <LinearLayout
+            android:id="@+id/audioLinearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/audioImageView"
-            android:src="@drawable/ic_baseline_play_arrow_24"
-            android:background="@drawable/circle_audio"/>
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/audioImageView"
+                android:src="@drawable/ic_baseline_play_arrow_24"
+                android:background="@drawable/circle_audio"/>
+
+            <TextView
+                android:id="@+id/audioNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="oi"
+                android:paddingStart="5dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
 
 
         <TextView

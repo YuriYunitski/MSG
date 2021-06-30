@@ -165,40 +165,6 @@ EnterActivity extends AppCompatActivity implements View.OnClickListener {
         user.setName(nameEditText.getText().toString().trim());
         user.setPassword(passwordEditText.getText().toString().trim());
         user.setProfilePhotoUrl("https://firebasestorage.googleapis.com/v0/b/mcgmessenger-26c67.appspot.com/o/profile_images%2Fperson_image.png?alt=media&token=132f8b24-741d-461c-9cb8-d7cc48d8c5fa");
-//        int r = (int)(Math.random()*16);
-//        if (r == 0){
-//            user.setAvatarMockupResource(R.drawable.user_image);
-//        } else if (r == 1){
-//            user.setAvatarMockupResource(R.drawable.user_image1);
-//        } else if (r == 2){
-//            user.setAvatarMockupResource(R.drawable.user_image2);
-//        } else if (r == 3){
-//            user.setAvatarMockupResource(R.drawable.user_image3);
-//        } else if (r == 4){
-//            user.setAvatarMockupResource(R.drawable.user_image4);
-//        } else if (r == 5){
-//            user.setAvatarMockupResource(R.drawable.user_image5);
-//        } else if (r == 6){
-//            user.setAvatarMockupResource(R.drawable.user_image6);
-//        } else if (r == 7){
-//            user.setAvatarMockupResource(R.drawable.user_image7);
-//        } else if (r == 8){
-//            user.setAvatarMockupResource(R.drawable.user_image8);
-//        } else if (r == 9){
-//            user.setAvatarMockupResource(R.drawable.user_image9);
-//        } else if (r == 10){
-//            user.setAvatarMockupResource(R.drawable.user_image10);
-//        } else if (r == 11){
-//            user.setAvatarMockupResource(R.drawable.user_image11);
-//        } else if (r == 12){
-//            user.setAvatarMockupResource(R.drawable.user_image12);
-//        } else if (r == 13){
-//            user.setAvatarMockupResource(R.drawable.user_image13);
-//        } else if (r == 14){
-//            user.setAvatarMockupResource(R.drawable.user_image14);
-//        } else if (r == 15){
-//            user.setAvatarMockupResource(R.drawable.user_image15);
-//        }
 
         usersDatabaseReference.push().setValue(user);
     }

@@ -12,14 +12,13 @@ public class MSGmessage {
     private String pusId;
     private boolean isRead;
     private String videoUrl;
-    private int imageWidth;
     private String audioUrl;
-    private boolean isAudioPlaying;
+    private String audioName;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, int imageWidth, String audioUrl, boolean isAudioPlaying) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, String audioUrl, String audioName) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -31,9 +30,8 @@ public class MSGmessage {
         this.pusId = pusId;
         this.isRead = isRead;
         this.videoUrl = videoUrl;
-        this.imageWidth = imageWidth;
         this.audioUrl = audioUrl;
-        this.isAudioPlaying = isAudioPlaying;
+        this.audioName = audioName;
     }
 
     public String getText() {
@@ -124,15 +122,6 @@ public class MSGmessage {
         this.videoUrl = videoUrl;
     }
 
-
-    public int getImageWidth() {
-        return imageWidth;
-    }
-
-    public void setImageWidth(int imageWidth) {
-        this.imageWidth = imageWidth;
-    }
-
     public String getAudioUrl() {
         return audioUrl;
     }
@@ -141,11 +130,11 @@ public class MSGmessage {
         this.audioUrl = audioUrl;
     }
 
-    public boolean isAudioPlaying() {
-        return isAudioPlaying;
+    public String getAudioName() {
+        return audioName;
     }
 
-    public void setAudioPlaying(boolean audioPlaying) {
-        isAudioPlaying = audioPlaying;
+    public void setAudioName(String audioName) {
+        this.audioName = audioName;
     }
 }

@@ -11,14 +11,18 @@ import androidx.core.app.NotificationManagerCompat;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -33,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -53,6 +58,7 @@ import com.yunitski.msg.adapters.MSGAdapter;
 import com.yunitski.msg.data.MSGmessage;
 import com.yunitski.msg.data.User;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -105,12 +111,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> urisList;
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
+    ArrayList<String> audioNameList;
 
     AlertDialog.Builder builder;
     AlertDialog dialog;
 
     private MediaPlayer mediaPlayer;
     private boolean isPlay;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +154,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         urisList = new ArrayList<>();
         videoUrisList = new ArrayList<>();
         audioUrisList = new ArrayList<>();
+        audioNameList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
         sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -269,6 +278,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         videoUrisList.add(message.getVideoUrl());
                     } else if (message.getAudioUrl() != null){
                         audioUrisList.add(message.getAudioUrl());
+                        audioNameList.add(message.getAudioName());
                     }
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
@@ -283,6 +293,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         videoUrisList.add(message.getVideoUrl());
                     } else if (message.getAudioUrl() != null){
                         audioUrisList.add(message.getAudioUrl());
+                        audioNameList.add(message.getAudioName());
                     }
                    }
                 if (!message.getSender().equals(auth.getCurrentUser().getUid())
@@ -471,6 +482,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("imageUris", urisList);
             intent.putExtra("videosUris", videoUrisList);
             intent.putExtra("audioUris", audioUrisList);
+            intent.putExtra("audioName", audioNameList);
             intent.putExtra("recipientUserAvatar", recipientUserAvatar);
             startActivity(intent);
         }
@@ -522,11 +534,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             });
             dialog.dismiss();
         } else if (requestCode == RC_VIDEO_PICKER && resultCode == RESULT_OK){
-            Uri selectedImageUri = data.getData();
-            final StorageReference imageReference = chatVideosStorageReference.child(selectedImageUri.getLastPathSegment());
-            UploadTask uploadTask = imageReference.putFile(selectedImageUri);
+            Uri selectedVideoUri = data.getData();
+            final StorageReference imageReference = chatVideosStorageReference.child(selectedVideoUri.getLastPathSegment());
+            UploadTask uploadTask = imageReference.putFile(selectedVideoUri);
 
-            uploadTask = imageReference.putFile(selectedImageUri);
+            uploadTask = imageReference.putFile(selectedVideoUri);
 
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
@@ -562,11 +574,12 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             });
             dialog.dismiss();
         }  else if (requestCode == RC_AUDIO_PICKER && resultCode == RESULT_OK){
-            Uri selectedImageUri = data.getData();
-            final StorageReference imageReference = chatAudioStorageReference.child(selectedImageUri.getLastPathSegment());
-            UploadTask uploadTask = imageReference.putFile(selectedImageUri);
+            Uri selectedAudioUri = data.getData();
+            String name = queryName(getContentResolver(), selectedAudioUri);
+            final StorageReference imageReference = chatAudioStorageReference.child(selectedAudioUri.getLastPathSegment());
+            UploadTask uploadTask = imageReference.putFile(selectedAudioUri);
 
-            uploadTask = imageReference.putFile(selectedImageUri);
+            uploadTask = imageReference.putFile(selectedAudioUri);
 
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
@@ -584,7 +597,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setAudioUrl(downloadUri.toString());
-                        gmessage.setAudioPlaying(false);
+                        gmessage.setAudioName(name);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
@@ -595,6 +608,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         messageListView.setSelection(adapter.getCount() - 1);
                         MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
                         mp.start();
+//                        Toast.makeText(getApplicationContext(), "" + queryName(getContentResolver(), selectedAudioUri), Toast.LENGTH_SHORT).show();
                     } else {
                         // Handle failures
                         // ...
@@ -603,6 +617,17 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             });
             dialog.dismiss();
         }
+    }
+
+    private String queryName(ContentResolver resolver, Uri uri) {
+        Cursor returnCursor =
+                resolver.query(uri, null, null, null, null);
+        assert returnCursor != null;
+        int nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        returnCursor.moveToFirst();
+        String name = returnCursor.getString(nameIndex);
+        returnCursor.close();
+        return name;
     }
 
 

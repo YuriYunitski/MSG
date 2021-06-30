@@ -186,6 +186,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         private final ImageView photoImageView;
         private final ImageView audioImageView;
         private final LinearLayout messageLinearLayout;
+        private final LinearLayout audioLinearLayout;
+        private final TextView audioNameTextView;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
@@ -193,6 +195,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             messageTimeTextView = view.findViewById(R.id.messageTimeTextView);
             messageLinearLayout = view.findViewById(R.id.messageLinearLayout);
             audioImageView = view.findViewById(R.id.audioImageView);
+            audioLinearLayout = view.findViewById(R.id.audioLinearLayout);
+            audioNameTextView = view.findViewById(R.id.audioNameTextView);
 
         }
         private void selectItem(MSGmessage msGmessage){
@@ -227,11 +231,13 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 audioImageView.setVisibility(View.GONE);
                 messageTextView.setText(msGmessage.getText());
                 messageTimeTextView.setText(msGmessage.getTime());
+                audioLinearLayout.setVisibility(View.GONE);
             } else if (msGmessage.getImageUrl() != null){
 
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.VISIBLE);
                 audioImageView.setVisibility(View.GONE);
+                audioLinearLayout.setVisibility(View.GONE);
                 Glide.with(photoImageView.getContext()).asBitmap().load(msGmessage.getImageUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
 
@@ -241,6 +247,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 messageTextView.setText("ᐅ");
                 photoImageView.setVisibility(View.VISIBLE);
                 audioImageView.setVisibility(View.GONE);
+                audioLinearLayout.setVisibility(View.GONE);
                 Glide.with(photoImageView.getContext()).load(msGmessage.getVideoUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
             } else if (msGmessage.getAudioUrl() != null){
@@ -248,7 +255,9 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.GONE);
                 audioImageView.setVisibility(View.VISIBLE);
+                audioLinearLayout.setVisibility(View.VISIBLE);
                 messageTimeTextView.setText(msGmessage.getTime());
+                audioNameTextView.setText(msGmessage.getAudioName());
 //                if (!msGmessage.isAudioPlaying()){
 //                    audioImageView.setImageResource(R.drawable.ic_baseline_play_arrow_24);
 //                } else {

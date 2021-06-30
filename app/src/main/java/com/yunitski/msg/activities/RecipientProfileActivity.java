@@ -34,6 +34,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
     ArrayList<String> urisList;
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
+    ArrayList<String> audioNameList;
     ArrayList<ImagesInProfile> imagesInProfileArrayList;
     ArrayList<VideosInProfile> videosInProfileArrayList;
     ArrayList<AudioInProfile> audioInProfileArrayList;
@@ -73,6 +74,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         urisList = intent.getStringArrayListExtra("imageUris");
         videoUrisList = intent.getStringArrayListExtra("videosUris");
         audioUrisList = intent.getStringArrayListExtra("audioUris");
+        audioNameList = intent.getStringArrayListExtra("audioName");
         userNameRecipientProfileTextView.setText(intent.getStringExtra("recipientUserName"));
         Glide.with(recipientUserAvatar).load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
         photoTextView.setTextColor(Color.BLACK);
@@ -138,6 +140,8 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         if (photo && !video && !file && !audio){
             if (urisList.size() == 0){
                 noMediaTextView.setText("Нет фотографий");
+            } else {
+                noMediaTextView.setText("");
             }
             imagesInProfileArrayList = new ArrayList<>();
             Collections.reverse(urisList);
@@ -162,7 +166,9 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         } else if (!photo && video && !file && !audio){
             if (videoUrisList.size() == 0){
             noMediaTextView.setText("Нет видео");
-        }
+        } else {
+                noMediaTextView.setText("");
+            }
 
             videosInProfileArrayList = new ArrayList<>();
             Collections.reverse(videoUrisList);
@@ -184,17 +190,17 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
                     startActivity(intent);
                 }
             });
-        } else if (!photo && !video && file && !audio){
-
         } else if (!photo && !video && !file && audio){
-            if (audioUrisList.size() == 0){
-                noMediaTextView.setText("Нет видео");
+            if (audioNameList.size() == 0){
+                noMediaTextView.setText("Нет аудио");
+            } else {
+                noMediaTextView.setText("");
             }
 
             audioInProfileArrayList = new ArrayList<>();
             Collections.reverse(audioUrisList);
             for (int i = 0; i < audioUrisList.size(); i++){
-                audioInProfileArrayList.add(new AudioInProfile(audioUrisList.get(i)));
+                audioInProfileArrayList.add(new AudioInProfile(audioUrisList.get(i), audioNameList.get(i)));
             }
 
             LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
@@ -224,6 +230,8 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
 //                    thread.start();
                 }
             });
+        } else if (!photo && !video && file && !audio){
+
         }
 
 
