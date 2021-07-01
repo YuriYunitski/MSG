@@ -226,25 +226,28 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 //                DownloadingFromUrl downloadingFromUrl = new DownloadingFromUrl();
 //                downloadingFromUrl.execute(msGmessageArrayList.get(position).getAudioUrl());
                 boolean success = false;
-                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                    if (msGmessageArrayList.get(position).getAudioLocation().equals("0")){
-                        new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
-                        Toast.makeText(getApplicationContext(), "" + nameD, Toast.LENGTH_SHORT).show();
-                        success = true;
-                    } else if (!msGmessageArrayList.get(position).getAudioLocation().equals("0")){
-                        if (!isPlay){
-                            //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-                            mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
-                            mediaPlayer.start();
-                            view.setImageResource(R.drawable.ic_baseline_pause_24);
-                            isPlay = true;
+                if (msGmessageArrayList.get(position).getAudioLocation() != null){
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                        if (msGmessageArrayList.get(position).getAudioLocation().equals("0")){
+                            new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
+                            Toast.makeText(getApplicationContext(), "" + nameD, Toast.LENGTH_SHORT).show();
+                            success = true;
                         } else {
-                            mediaPlayer.stop();
-                            view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                            isPlay = false;
+                            if (!isPlay){
+                                //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
+                                mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
+                                mediaPlayer.start();
+                                view.setImageResource(R.drawable.ic_baseline_pause_24);
+                                isPlay = true;
+                            } else {
+                                mediaPlayer.stop();
+                                view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                                isPlay = false;
+                            }
                         }
                     }
                 }
+
                 if (success){
 
                 }
