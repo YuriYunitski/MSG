@@ -6,31 +6,37 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
+import android.Manifest;
+import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -58,7 +64,14 @@ import com.yunitski.msg.adapters.MSGAdapter;
 import com.yunitski.msg.data.MSGmessage;
 import com.yunitski.msg.data.User;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -112,13 +125,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
     ArrayList<String> audioNameList;
+    ArrayList<String> audioLocList;
 
     AlertDialog.Builder builder;
     AlertDialog dialog;
 
     private MediaPlayer mediaPlayer;
     private boolean isPlay;
-    String name;
+    String nameD;
+    private ProgressDialog pDialog;
+    private static final int progress_bar_type = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,6 +156,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatVideosStorageReference = storage.getReference().child("chat_videos");
         chatAudioStorageReference = storage.getReference().child("chat_audio");
 
+        ActivityCompat.requestPermissions(ChatActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
 
         Intent intent = getIntent();
         if (intent != null){
@@ -155,6 +172,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         videoUrisList = new ArrayList<>();
         audioUrisList = new ArrayList<>();
         audioNameList = new ArrayList<>();
+        audioLocList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
         sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -195,16 +213,45 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         });
         adapter.setOnAudioClickListener((position, view) -> {
             if (msGmessageArrayList.get(position).getAudioUrl() != null){
-                if (!isPlay){
-                    mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-                    mediaPlayer.start();
-                    view.setImageResource(R.drawable.ic_baseline_pause_24);
-                    isPlay = true;
-                } else {
-                    mediaPlayer.stop();
-                    view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-                    isPlay = false;
+//                if (!isPlay){
+//                    mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
+//                    mediaPlayer.start();
+//                    view.setImageResource(R.drawable.ic_baseline_pause_24);
+//                    isPlay = true;
+//                } else {
+//                    mediaPlayer.stop();
+//                    view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+//                    isPlay = false;
+//                }
+//                DownloadingFromUrl downloadingFromUrl = new DownloadingFromUrl();
+//                downloadingFromUrl.execute(msGmessageArrayList.get(position).getAudioUrl());
+                boolean success = false;
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
+                    if (msGmessageArrayList.get(position).getAudioLocation().equals("0")){
+                        new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
+                        Toast.makeText(getApplicationContext(), "" + nameD, Toast.LENGTH_SHORT).show();
+                        success = true;
+                    } else if (!msGmessageArrayList.get(position).getAudioLocation().equals("0")){
+                        if (!isPlay){
+                            //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
+                            mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
+                            mediaPlayer.start();
+                            view.setImageResource(R.drawable.ic_baseline_pause_24);
+                            isPlay = true;
+                        } else {
+                            mediaPlayer.stop();
+                            view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                            isPlay = false;
+                        }
+                    }
                 }
+                if (success){
+
+                }
+
+
+
+
             }
         });
 
@@ -294,6 +341,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     } else if (message.getAudioUrl() != null){
                         audioUrisList.add(message.getAudioUrl());
                         audioNameList.add(message.getAudioName());
+                        audioLocList.add(message.getAudioLocation());
                     }
                    }
                 if (!message.getSender().equals(auth.getCurrentUser().getUid())
@@ -598,6 +646,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setAudioUrl(downloadUri.toString());
                         gmessage.setAudioName(name);
+                        gmessage.setAudioLocation("0");
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
@@ -661,5 +710,112 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        switch (id) {
+            case progress_bar_type: // we set this to 0
+                pDialog = new ProgressDialog(this);
+                pDialog.setMessage("Downloading file. Please wait...");
+                pDialog.setIndeterminate(false);
+                pDialog.setMax(100);
+                pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                pDialog.setCancelable(true);
+                pDialog.show();
+                return pDialog;
+            default:
+                return null;
+        }
+    }
+
+    class DownloadFileFromURL extends AsyncTask<String, String, String>{
+
+        private String name;
+
+        private int position;
+
+
+        public DownloadFileFromURL(String name, int position){
+            this.name = name;
+            this.position = position;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            showDialog(progress_bar_type);
+        }
+
+        @Override
+        protected String doInBackground(String... f_url) {
+            int count;
+            File filesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            if (!filesDir.exists()){
+                filesDir.mkdirs();
+            }
+            String fileName = name + ".mp3";
+            File file = new File(filesDir, fileName);
+            FirebaseDatabase  database = FirebaseDatabase.getInstance();
+            DatabaseReference mDatabaseRef = database.getReference();
+            mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioLocation").setValue(file.toString());
+            try {
+                if (!file.exists()) {
+                    if (!file.createNewFile()) {
+                        throw new IOException("Cant able to create file");
+                    }
+                }
+                URL url = new URL(f_url[0]);
+                URLConnection connection = url.openConnection();
+                connection.connect();
+
+                // this will be useful so that you can show a tipical 0-100%
+                // progress bar
+                int lenghtOfFile = connection.getContentLength();
+
+                // download the file
+                InputStream input = new BufferedInputStream(url.openStream());
+
+                // Output stream
+
+                OutputStream output = new FileOutputStream(file);
+                nameD = file.toString();
+
+                byte data[] = f_url[0].getBytes();
+
+                long total = 0;
+
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    // publishing the progress....
+                    // After this onProgressUpdate will be called
+                    publishProgress("" + (int) ((total * 100) / lenghtOfFile));
+
+                    // writing data to file
+                    output.write(data, 0, count);
+                }
+
+                // flushing output
+                output.flush();
+
+                // closing streams
+                output.close();
+                input.close();
+
+            } catch (Exception e) {
+                Log.e("Error: ", e.getMessage());
+            }
+
+            return null;
+        }
+        protected void onProgressUpdate(String... progress) {
+            // setting progress percentage
+            pDialog.setProgress(Integer.parseInt(progress[0]));
+        }
+        @Override
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog after the file was downloaded
+            dismissDialog(progress_bar_type);
+
+        }
     }
 }

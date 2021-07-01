@@ -1,9 +1,12 @@
 package com.yunitski.msg.data;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,41 +15,48 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class DownloadingFromUrl extends AsyncTask<String, String, String> {
+public class DownloadingFromUrl extends AsyncTask<String, Void, String> {
+
+    private Context context;
+
+    public DownloadingFromUrl(Context context) {
+        this.context = context;
+    }
+
     @Override
     protected String doInBackground(String... strings) {
         int count;
         try {
             URL url = new URL(strings[0]);
-            URLConnection connection = url.openConnection();
-            connection.connect();
-            int lenghtOfFile = connection.getContentLength();
+            URLConnection conexion = url.openConnection();
+            conexion.connect();
+            // this will be useful so that you can show a tipical 0-100% progress bar
+            int lenghtOfFile = conexion.getContentLength();
+
+            // downlod the file
             InputStream input = new BufferedInputStream(url.openStream());
-            OutputStream output = new FileOutputStream(Environment
-                    .getExternalStorageDirectory().toString() + "/mcgMusic");
-            byte[] data = new byte[1024];
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/msgMusic");
+            OutputStream output = new FileOutputStream(file);
+
+            byte data[] = strings[0].getBytes();
 
             long total = 0;
+            Log.d("download msg", ""+file.getAbsolutePath());
 
             while ((count = input.read(data)) != -1) {
                 total += count;
                 // publishing the progress....
-                // After this onProgressUpdate will be called
-                publishProgress("" + (int) ((total * 100) / lenghtOfFile));
-
-                // writing data to file
+                publishProgress((int)(total*100/lenghtOfFile));
                 output.write(data, 0, count);
             }
 
-            // flushing output
             output.flush();
-
-            // closing streams
             output.close();
             input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
         return null;
+    }
+
+    private void publishProgress(int i) {
     }
 }
