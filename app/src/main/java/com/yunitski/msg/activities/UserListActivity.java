@@ -110,8 +110,10 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
                     MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
                     if (!message.getSender().equals(auth.getCurrentUser().getUid()) && !message.isRead() && message.getRecipient().equals(auth.getCurrentUser().getUid())) {
                         sharedPreferences = getSharedPreferences("isActiveList", Context.MODE_PRIVATE);
-                        sharedPreferences2 = getSharedPreferences("isActive", Context.MODE_PRIVATE);
-                        boolean isA = sharedPreferences.getBoolean("isActiveList", true) && !sharedPreferences2.getBoolean("isActive", true);
+//                        sharedPreferences2 = getSharedPreferences(ChatActivity.ACTIVITY_INFO_FILE, Context.MODE_PRIVATE);
+                        boolean isA = sharedPreferences.getBoolean("isActiveList", true)
+//                                && !sharedPreferences2.getBoolean(ChatActivity.ACTIVITY_KEY, false)
+                                ;
                         if (isA){
                             createNotification();
                             addNotification(message.getText(), message.getName());
@@ -244,6 +246,9 @@ public class UserListActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void addNotification(String message, String userName){
+//
+//        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
 //        Intent intent = new Intent(this, UserListActivity.class);
 //        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);

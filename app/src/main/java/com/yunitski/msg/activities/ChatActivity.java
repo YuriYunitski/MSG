@@ -14,6 +14,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -78,6 +79,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 import static com.yunitski.msg.activities.UserListActivity.CHANNEL_ID;
 import static com.yunitski.msg.activities.UserListActivity.NOTIFICATION_ID;
@@ -138,6 +140,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ProgressDialog pDialog;
     private static final int progress_bar_type = 0;
     private boolean downloaded;
+    private boolean act;
+    public final static String ACTIVITY_INFO_FILE = "activityFile";
+    public final static String ACTIVITY_KEY = "activityKey";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,10 +182,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         audioNameList = new ArrayList<>();
         audioLocList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
-        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isActive", true);
-        editor.apply();
+//        SharedPreferences shh = getSharedPreferences("isActiveFile", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = shh.edit();
+//        editor.putBoolean("isActive", true);
+//        editor.apply();
+//        act = shh.getBoolean("isActive", true);
 
 
         downloaded = false;
@@ -332,38 +338,62 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                     msGmessageArrayList.add(message);
                     adapter.add(message);
-                    if (message.getImageUrl() != null){
+                    if (message.getImageUrl() != null) {
                         urisList.add(message.getImageUrl());
-                    } else if (message.getVideoUrl() != null){
+                    } else if (message.getVideoUrl() != null) {
                         videoUrisList.add(message.getVideoUrl());
-                    } else if (message.getAudioUrl() != null){
+                    } else if (message.getAudioUrl() != null) {
                         audioUrisList.add(message.getAudioUrl());
                         audioNameList.add(message.getAudioName());
                         audioLocList.add(message.getAudioLocation());
                     }
-                   }
-                if (!message.getSender().equals(auth.getCurrentUser().getUid())
-                        && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
-                        && message.getSender().equals(recipientUserId) && !message.isDeleted()){
+                    if (!message.getSender().equals(auth.getCurrentUser().getUid())
+                            && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
+                            && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
+//                        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+                        SharedPreferences sh = getSharedPreferences(ACTIVITY_INFO_FILE, Context.MODE_PRIVATE);
+                        boolean isA = sh.getBoolean(ACTIVITY_KEY, true);
+                        if (isA) {
 
-                    sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
-                    boolean isA = sharedPreferences.getBoolean("isActive", true);
-                    if (isA){
-                        if (!message.isRead()){
-                            MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.unsure_566);
-                            mp.start();
+                            if (!message.isRead()) {
+                                MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.unsure_566);
+                                mp.start();
+                            }
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+                            DatabaseReference mDatabaseRef = database.getReference();
+                            mDatabaseRef.child("messages").child(message.getPusId()).child("read").setValue(true);
+                        } else {
+
+                            createNotification();
+                            addNotification(message.getText(), message.getName());
                         }
-                        FirebaseDatabase  database = FirebaseDatabase.getInstance();
-                        DatabaseReference mDatabaseRef = database.getReference();
-                        mDatabaseRef.child("messages").child(msGmessageArrayList.get(msGmessageArrayList.size() - 1).getPusId()).child("read").setValue(true);
-
-                    } else {
-                        createNotification();
-                        addNotification(message.getText(), message.getName());
                     }
+
+//                    if (!message.getSender().equals(auth.getCurrentUser().getUid())
+//                            && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
+//                            && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
+//                        if (act){
+//                            if (!message.isRead()) {
+//                                MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.unsure_566);
+//                                mp.start();
+//                            }
+//                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                            DatabaseReference mDatabaseRef = database.getReference();
+//                            mDatabaseRef.child("messages").child(message.getPusId()).child("read").setValue(true);
+//                        } else {
+//
+////                            createNotification();
+////                            addNotification(message.getText(), message.getName());
+//                        }
+//
+//                        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
+//                        boolean isA = sharedPreferences.getBoolean("isActive", true);
+//                        if (isA) {
+//
+//
+//                        }
+//                    }
                 }
-
-
             }
 
             @Override
@@ -404,15 +434,53 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         //registerForContextMenu(messageListView);
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
+        reference.addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        act = ss.getBoolean("isActive", false);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        SharedPreferences ss = getSharedPreferences(ACTIVITY_INFO_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = ss.edit();
+        editor.putBoolean(ACTIVITY_KEY, true);
+        editor.apply();
+        cancelNotification(getApplicationContext(), NOTIFICATION_ID);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        sharedPreferences = getSharedPreferences("isActive", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("isActive", false);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        SharedPreferences ss = getSharedPreferences(ACTIVITY_INFO_FILE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = ss.edit();
+        editor.putBoolean(ACTIVITY_KEY, false);
         editor.apply();
+//        act = ss.getBoolean("isActive", false);
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
@@ -700,14 +768,24 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void addNotification(String message, String userName){
+//
+//        Intent intent = new Intent(getApplicationContext(), ChatActivity.class);
+//        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 0, intent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID);
         builder.setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(userName)
                 .setContentText(message)
                 .setAutoCancel(true)
+//                .setContentIntent(pendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
         notificationManagerCompat.notify(NOTIFICATION_ID, builder.build());
+    }
+
+    public static void cancelNotification(Context ctx, int notifyId) {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager nMgr = (NotificationManager) ctx.getSystemService(ns);
+        nMgr.cancel(notifyId);
     }
 
     @Override
