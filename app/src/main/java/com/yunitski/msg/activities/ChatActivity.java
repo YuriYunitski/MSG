@@ -50,11 +50,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -135,6 +137,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     String nameD;
     private ProgressDialog pDialog;
     private static final int progress_bar_type = 0;
+    private boolean downloaded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -180,7 +183,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         editor.apply();
 
 
-
+        downloaded = false;
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
         addContentImageButton = findViewById(R.id.addContentImageButton);
@@ -212,27 +215,30 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         adapter.setOnAudioClickListener((position, view) -> {
-            if (msGmessageArrayList.get(position).getAudioUrl() != null){
-//                if (!isPlay){
-//                    mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-//                    mediaPlayer.start();
-//                    view.setImageResource(R.drawable.ic_baseline_pause_24);
-//                    isPlay = true;
-//                } else {
-//                    mediaPlayer.stop();
-//                    view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
-//                    isPlay = false;
-//                }
-//                DownloadingFromUrl downloadingFromUrl = new DownloadingFromUrl();
-//                downloadingFromUrl.execute(msGmessageArrayList.get(position).getAudioUrl());
-                boolean success = false;
-                if (msGmessageArrayList.get(position).getAudioLocation() != null){
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED){
-                        if (msGmessageArrayList.get(position).getAudioLocation().equals("0")){
+                if (msGmessageArrayList.get(position).getAudioLocation() == null){
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                             new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
-                            Toast.makeText(getApplicationContext(), "" + nameD, Toast.LENGTH_SHORT).show();
-                            success = true;
-                        } else {
+                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
+                            reference.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                        MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
+                                        if (message.getRecipient().equals(auth.getCurrentUser().getUid()) && message.getSender().equals(recipientUserId)
+                                        || message.getSender().equals(auth.getCurrentUser().getUid()) && message.getRecipient().equals(recipientUserId)){
+                                            msGmessageArrayList.get(position).setAudioLocation(message.getAudioLocation());
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+                    if (msGmessageArrayList.get(position).getAudioLocation() != null || downloaded){
                             if (!isPlay){
                                 //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
                                 mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
@@ -244,18 +250,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                                 isPlay = false;
                             }
-                        }
                     }
-                }
-
-                if (success){
-
-                }
-
-
-
-
-            }
         });
 
         messageEditText.addTextChangedListener(new TextWatcher() {
@@ -649,7 +644,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setAudioUrl(downloadUri.toString());
                         gmessage.setAudioName(name);
-                        gmessage.setAudioLocation("0");
+                        gmessage.setAudioLocation(null);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
@@ -758,9 +753,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
             String fileName = name + ".mp3";
             File file = new File(filesDir, fileName);
-            FirebaseDatabase  database = FirebaseDatabase.getInstance();
-            DatabaseReference mDatabaseRef = database.getReference();
-            mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioLocation").setValue(file.toString());
             try {
                 if (!file.exists()) {
                     if (!file.createNewFile()) {
@@ -782,7 +774,11 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
                 OutputStream output = new FileOutputStream(file);
                 nameD = file.toString();
+                FirebaseDatabase  database = FirebaseDatabase.getInstance();
+                DatabaseReference mDatabaseRef = database.getReference();
+                mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioLocation").setValue(file.toString());
 
+                downloaded = true;
                 byte data[] = f_url[0].getBytes();
 
                 long total = 0;
