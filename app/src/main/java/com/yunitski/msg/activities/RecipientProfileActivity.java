@@ -25,6 +25,7 @@ import com.yunitski.msg.data.AudioInProfile;
 import com.yunitski.msg.data.ImagesInProfile;
 import com.yunitski.msg.data.VideosInProfile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -199,6 +200,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
 
             audioInProfileArrayList = new ArrayList<>();
             Collections.reverse(audioUrisList);
+            Collections.reverse(audioNameList);
             for (int i = 0; i < audioUrisList.size(); i++){
                 audioInProfileArrayList.add(new AudioInProfile(audioUrisList.get(i), audioNameList.get(i)));
             }
@@ -212,8 +214,14 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
                 @Override
                 public void onAudioClick(int position, ImageView view) {
                     if (!isPlay){
-                        mediaPlayer = MediaPlayer.create(RecipientProfileActivity.this, Uri.parse(audioInProfileArrayList.get(position).getAudioUrl()));
-                        mediaPlayer.start();
+                        mediaPlayer = new MediaPlayer();
+                        try {
+                            mediaPlayer.setDataSource(RecipientProfileActivity.this, Uri.parse(audioUrisList.get(position)));
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         view.setImageResource(R.drawable.ic_baseline_pause_24);
                         isPlay = true;
                     } else {

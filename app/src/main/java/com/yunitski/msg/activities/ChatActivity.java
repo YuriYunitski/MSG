@@ -104,6 +104,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private StorageReference chatImagesStorageReference;
     private StorageReference chatVideosStorageReference;
     private StorageReference chatAudioStorageReference;
+    private StorageReference chatFileStorageReference;
 
     private Toolbar toolbar;
 
@@ -123,8 +124,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView profilePhotoImageView;
     private LinearLayout titleLinearLayout;
 
-
-    SharedPreferences sharedPreferences;
     ArrayList<String> urisList;
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
@@ -163,6 +162,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         chatImagesStorageReference = storage.getReference().child("chat_images");
         chatVideosStorageReference = storage.getReference().child("chat_videos");
         chatAudioStorageReference = storage.getReference().child("chat_audio");
+        chatFileStorageReference = storage.getReference().child("chat_files");
 
         ActivityCompat.requestPermissions(ChatActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
 
@@ -182,12 +182,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         audioNameList = new ArrayList<>();
         audioLocList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
-//        SharedPreferences shh = getSharedPreferences("isActiveFile", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = shh.edit();
-//        editor.putBoolean("isActive", true);
-//        editor.apply();
-//        act = shh.getBoolean("isActive", true);
-
 
         downloaded = false;
         messageListView = findViewById(R.id.mainActivityListView);
@@ -221,34 +215,43 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
         adapter.setOnAudioClickListener((position, view) -> {
-                if (msGmessageArrayList.get(position).getAudioLocation() == null){
-                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                            new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
-                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
-                            reference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                        MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-                                        if (message.getRecipient().equals(auth.getCurrentUser().getUid()) && message.getSender().equals(recipientUserId)
-                                        || message.getSender().equals(auth.getCurrentUser().getUid()) && message.getRecipient().equals(recipientUserId)){
-                                            msGmessageArrayList.get(position).setAudioLocation(message.getAudioLocation());
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-                        }
-                    }
-                    if (msGmessageArrayList.get(position).getAudioLocation() != null || downloaded){
+//                if (msGmessageArrayList.get(position).getAudioLocation() == null || msGmessageArrayList.get(position).getAudioLocation().equals("")){
+//                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+//                            new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
+//                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
+//                            reference.addValueEventListener(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+//                                        MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
+//                                        if (message.getRecipient().equals(auth.getCurrentUser().getUid()) && message.getSender().equals(recipientUserId)
+//                                        || message.getSender().equals(auth.getCurrentUser().getUid()) && message.getRecipient().equals(recipientUserId)){
+//                                            msGmessageArrayList.get(position).setAudioLocation(message.getAudioLocation());
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                }
+//                            });
+//                        }
+//                    }
+//                    if (msGmessageArrayList.get(position).getAudioLocation() != null || downloaded){
                             if (!isPlay){
+                                mediaPlayer = new MediaPlayer();
+                                try {
+                                    mediaPlayer.setDataSource(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
+                                    mediaPlayer.prepare();
+                                    mediaPlayer.start();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
                                 //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-                                mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
-                                mediaPlayer.start();
+//                                mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
+
                                 view.setImageResource(R.drawable.ic_baseline_pause_24);
                                 isPlay = true;
                             } else {
@@ -256,7 +259,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                                 isPlay = false;
                             }
-                    }
+//                    }
         });
 
         messageEditText.addTextChangedListener(new TextWatcher() {
@@ -559,7 +562,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
                     intent.addCategory(Intent.CATEGORY_OPENABLE);
                     intent.setType("application/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"application/*", "text/*"});
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"application/*"});
 //                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 //                    intent.setType("application/*");
 //                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
@@ -631,6 +634,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         gmessage.setImageUrl(downloadUri.toString());
                         gmessage.setVideoUrl(null);
                         gmessage.setAudioUrl(null);
+                        gmessage.setFileUrl(null);
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);
@@ -672,6 +676,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         gmessage.setVideoUrl(downloadUri.toString());
                         gmessage.setImageUrl(null);
                         gmessage.setAudioUrl(null);
+                        gmessage.setFileUrl(null);
                         gmessage.setName(userName);
                         gmessage.setSender(auth.getCurrentUser().getUid());
                         gmessage.setRecipient(recipientUserId);
@@ -712,7 +717,50 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setAudioUrl(downloadUri.toString());
                         gmessage.setAudioName(name);
-                        gmessage.setAudioLocation(null);
+                        gmessage.setFileUrl(null);
+                        gmessage.setVideoUrl(null);
+                        gmessage.setImageUrl(null);
+                        gmessage.setName(userName);
+                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setRecipient(recipientUserId);
+                        gmessage.setTime(currentDate());
+                        messagesDatabaseReference.push().setValue(gmessage);
+                        messageListView.setSelection(adapter.getCount() - 1);
+                        MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
+                        mp.start();
+//                        Toast.makeText(getApplicationContext(), "" + queryName(getContentResolver(), selectedAudioUri), Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Handle failures
+                        // ...
+                    }
+                }
+            });
+            dialog.dismiss();
+        }  else if (requestCode == RC_FILE_PICKER && resultCode == RESULT_OK){
+            Uri selectedFileUri = data.getData();
+            String name = queryName(getContentResolver(), selectedFileUri);
+            final StorageReference imageReference = chatAudioStorageReference.child(selectedFileUri.getLastPathSegment());
+            UploadTask uploadTask = imageReference.putFile(selectedFileUri);
+
+            uploadTask = imageReference.putFile(selectedFileUri);
+
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    // Continue with the task to get the download URL
+                    return imageReference.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        MSGmessage gmessage = new MSGmessage();
+                        gmessage.setFileUrl(downloadUri.toString());
+                        gmessage.setAudioUrl(null);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
@@ -825,7 +873,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         protected String doInBackground(String... f_url) {
             int count;
-            File filesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File filesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/MSGaudio");
             if (!filesDir.exists()){
                 filesDir.mkdirs();
             }

@@ -15,11 +15,13 @@ public class MSGmessage {
     private String audioUrl;
     private String audioName;
     private String audioLocation;
+    private String fileName;
+    private String fileUrl;
 
     public MSGmessage() {
     }
 
-    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, String audioUrl, String audioName, String audioLocation) {
+    public MSGmessage(String text, String name, String imageUrl, String sender, String recipient, boolean isMine, String time, boolean isDeleted, String pusId, boolean isRead, String videoUrl, String audioUrl, String audioName, String audioLocation, String fileName, String fileUrl) {
         this.text = text;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -34,6 +36,8 @@ public class MSGmessage {
         this.audioUrl = audioUrl;
         this.audioName = audioName;
         this.audioLocation = audioLocation;
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
     }
 
     public String getText() {
@@ -146,5 +150,21 @@ public class MSGmessage {
 
     public void setAudioLocation(String audioLocation) {
         this.audioLocation = audioLocation;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 }
