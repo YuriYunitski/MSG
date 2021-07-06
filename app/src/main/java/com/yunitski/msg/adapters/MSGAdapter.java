@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.appwidget.AppWidgetHost;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -224,7 +225,7 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         }
 
         void update(MSGmessage msGmessage){
-            boolean isText = msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null && msGmessage.getAudioUrl() == null;
+            boolean isText = msGmessage.getImageUrl() == null && msGmessage.getVideoUrl() == null && msGmessage.getAudioUrl() == null && msGmessage.getFileUrl() == null;
             if (isText){
                 messageTextView.setVisibility(View.VISIBLE);
                 photoImageView.setVisibility(View.GONE);
@@ -263,6 +264,16 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 //                } else {
 //                    audioImageView.setImageResource(R.drawable.ic_baseline_pause_24);
 //                }
+            } else if (msGmessage.getFileUrl() != null){
+
+                messageTextView.setVisibility(View.GONE);
+                photoImageView.setVisibility(View.GONE);
+                audioImageView.setVisibility(View.VISIBLE);
+                audioLinearLayout.setVisibility(View.VISIBLE);
+                messageTimeTextView.setText(msGmessage.getTime());
+                audioNameTextView.setText(msGmessage.getFileName());
+                audioImageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24_black);
+                audioImageView.setBackgroundColor(Color.TRANSPARENT);
             }
             if (selectedList.contains(msGmessage)){
 

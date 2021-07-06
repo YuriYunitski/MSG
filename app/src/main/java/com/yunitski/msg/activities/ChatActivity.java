@@ -739,7 +739,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         }  else if (requestCode == RC_FILE_PICKER && resultCode == RESULT_OK){
             Uri selectedFileUri = data.getData();
             String name = queryName(getContentResolver(), selectedFileUri);
-            final StorageReference imageReference = chatAudioStorageReference.child(selectedFileUri.getLastPathSegment());
+            final StorageReference imageReference = chatFileStorageReference.child(selectedFileUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedFileUri);
 
             uploadTask = imageReference.putFile(selectedFileUri);
@@ -760,6 +760,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
                         gmessage.setFileUrl(downloadUri.toString());
+                        gmessage.setFileName(name);
                         gmessage.setAudioUrl(null);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
