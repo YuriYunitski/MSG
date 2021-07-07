@@ -19,7 +19,7 @@ import java.util.List;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
 
-    private List<AudioInProfile> audioInProfileList;
+    private final List<AudioInProfile> audioInProfileList;
 
     private OnAudioClickListener listener;
 
@@ -28,7 +28,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         void onAudioClick(int position, ImageView view);
     }
 
-    public void setOnVideoClickListener(OnAudioClickListener listener){
+    public void setOnAudioClickListener(OnAudioClickListener listener){
         this.listener = listener;
     }
 
@@ -55,7 +55,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         return audioInProfileList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageViewAudio;
         TextView audioNameTextView;

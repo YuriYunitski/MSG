@@ -106,7 +106,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
     ArrayList<String> audioNameList;
-    ArrayList<String> audioLocList;
+    ArrayList<String> fileUrisList;
+    ArrayList<String> fileNameList;
 
     AlertDialog.Builder builder;
     AlertDialog dialog;
@@ -153,7 +154,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         videoUrisList = new ArrayList<>();
         audioUrisList = new ArrayList<>();
         audioNameList = new ArrayList<>();
-        audioLocList = new ArrayList<>();
+        fileUrisList = new ArrayList<>();
+        fileNameList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
@@ -282,6 +284,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     } else if (message.getAudioUrl() != null){
                         audioUrisList.add(message.getAudioUrl());
                         audioNameList.add(message.getAudioName());
+                    } else if (message.getFileUrl() != null){
+                        fileUrisList.add(message.getFileUrl());
+                        fileNameList.add(message.getFileName());
                     }
                 } else if (message.getRecipient().equals(auth.getCurrentUser().getUid())
                         && message.getSender().equals(recipientUserId) && !message.isDeleted()) {
@@ -297,7 +302,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     } else if (message.getAudioUrl() != null) {
                         audioUrisList.add(message.getAudioUrl());
                         audioNameList.add(message.getAudioName());
-                        audioLocList.add(message.getAudioLocation());
+                    } else if (message.getFileUrl() != null){
+                        fileUrisList.add(message.getFileUrl());
+                        fileNameList.add(message.getFileName());
                     }
                     if (!message.getSender().equals(auth.getCurrentUser().getUid())
                             && !message.getRecipient().equals(recipientUserId) && message.getRecipient().equals(auth.getCurrentUser().getUid())
@@ -511,6 +518,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             intent.putExtra("videosUris", videoUrisList);
             intent.putExtra("audioUris", audioUrisList);
             intent.putExtra("audioName", audioNameList);
+            intent.putExtra("fileUris", fileUrisList);
+            intent.putExtra("fileName", fileNameList);
             intent.putExtra("recipientUserAvatar", recipientUserAvatar);
             startActivity(intent);
         }

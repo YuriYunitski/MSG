@@ -19,9 +19,11 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.yunitski.msg.R;
 import com.yunitski.msg.adapters.AudioAdapter;
+import com.yunitski.msg.adapters.FileAdapter;
 import com.yunitski.msg.adapters.ImageAdapter;
 import com.yunitski.msg.adapters.VideoAdapter;
 import com.yunitski.msg.data.AudioInProfile;
+import com.yunitski.msg.data.FileInProfile;
 import com.yunitski.msg.data.ImagesInProfile;
 import com.yunitski.msg.data.VideosInProfile;
 
@@ -36,12 +38,16 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
     ArrayList<String> videoUrisList;
     ArrayList<String> audioUrisList;
     ArrayList<String> audioNameList;
+    ArrayList<String> fileUrisList;
+    ArrayList<String> fileNameList;
     ArrayList<ImagesInProfile> imagesInProfileArrayList;
     ArrayList<VideosInProfile> videosInProfileArrayList;
     ArrayList<AudioInProfile> audioInProfileArrayList;
+    ArrayList<FileInProfile> fileInProfileArrayList;
     ImageAdapter adapter;
     VideoAdapter videoAdapter;
     AudioAdapter audioAdapter;
+    FileAdapter fileAdapter;
     RecyclerView recyclerView;
     ImageView recipientUserAvatar;
     ImageButton recipientImageButton;
@@ -76,6 +82,8 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         videoUrisList = intent.getStringArrayListExtra("videosUris");
         audioUrisList = intent.getStringArrayListExtra("audioUris");
         audioNameList = intent.getStringArrayListExtra("audioName");
+        fileUrisList = intent.getStringArrayListExtra("fileUris");
+        fileNameList = intent.getStringArrayListExtra("fileName");
         userNameRecipientProfileTextView.setText(intent.getStringExtra("recipientUserName"));
         Glide.with(recipientUserAvatar).load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
         photoTextView.setTextColor(Color.BLACK);
@@ -210,7 +218,7 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             recyclerView.setLayoutManager(layoutManager);
             audioAdapter = new AudioAdapter(audioInProfileArrayList);
             recyclerView.setAdapter(audioAdapter);
-            audioAdapter.setOnVideoClickListener(new AudioAdapter.OnAudioClickListener() {
+            audioAdapter.setOnAudioClickListener(new AudioAdapter.OnAudioClickListener() {
                 @Override
                 public void onAudioClick(int position, ImageView view) {
                     if (!isPlay){
@@ -239,7 +247,31 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
                 }
             });
         } else if (!photo && !video && file && !audio){
-
+            if (fileNameList.size() == 0){
+                noMediaTextView.setText("Нет файлов");
+            } else {
+                noMediaTextView.setText("");
+            }
+            fileInProfileArrayList = new ArrayList<>();
+            Collections.reverse(fileNameList);
+            Collections.reverse(fileUrisList);
+            for (int i = 0; i < fileUrisList.size(); i++){
+                fileInProfileArrayList.add(new FileInProfile(fileUrisList.get(i), fileNameList.get(i)));
+            }
+            LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL, false);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setLayoutManager(layoutManager);
+            fileAdapter = new FileAdapter(fileInProfileArrayList);
+            recyclerView.setAdapter(fileAdapter);
+            fileAdapter.setOnFileClickListener(new FileAdapter.OnFileClickListener() {
+                @Override
+                public void onFileClick(int position) {
+                    Intent intent13 = new Intent(Intent.ACTION_VIEW);
+                    intent13.setDataAndType(Uri.parse(fileUrisList.get(position)), "application/*");
+                    intent13.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent13);
+                }
+            });
         }
 
 
