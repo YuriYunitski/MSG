@@ -189,6 +189,9 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
         private final LinearLayout messageLinearLayout;
         private final LinearLayout audioLinearLayout;
         private final TextView audioNameTextView;
+        private final ImageView fileImageView;
+        private final LinearLayout fileLinearLayout;
+        private final TextView fileNameTextView;
 
         public ViewHolder(View view){
             photoImageView = view.findViewById(R.id.photoImageView);
@@ -198,6 +201,9 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
             audioImageView = view.findViewById(R.id.audioImageView);
             audioLinearLayout = view.findViewById(R.id.audioLinearLayout);
             audioNameTextView = view.findViewById(R.id.audioNameTextView);
+            fileImageView = view.findViewById(R.id.fileImageView);
+            fileLinearLayout = view.findViewById(R.id.fileLinearLayout);
+            fileNameTextView = view.findViewById(R.id.fileNameTextView);
 
         }
         private void selectItem(MSGmessage msGmessage){
@@ -233,12 +239,16 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 messageTextView.setText(msGmessage.getText());
                 messageTimeTextView.setText(msGmessage.getTime());
                 audioLinearLayout.setVisibility(View.GONE);
+                fileLinearLayout.setVisibility(View.GONE);
+                fileImageView.setVisibility(View.GONE);
             } else if (msGmessage.getImageUrl() != null){
 
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.VISIBLE);
                 audioImageView.setVisibility(View.GONE);
                 audioLinearLayout.setVisibility(View.GONE);
+                fileLinearLayout.setVisibility(View.GONE);
+                fileImageView.setVisibility(View.GONE);
                 Glide.with(photoImageView.getContext()).asBitmap().load(msGmessage.getImageUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
 
@@ -249,6 +259,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 photoImageView.setVisibility(View.VISIBLE);
                 audioImageView.setVisibility(View.GONE);
                 audioLinearLayout.setVisibility(View.GONE);
+                fileLinearLayout.setVisibility(View.GONE);
+                fileImageView.setVisibility(View.GONE);
                 Glide.with(photoImageView.getContext()).load(msGmessage.getVideoUrl()).into(photoImageView);
                 messageTimeTextView.setText(msGmessage.getTime());
             } else if (msGmessage.getAudioUrl() != null){
@@ -257,6 +269,8 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 photoImageView.setVisibility(View.GONE);
                 audioImageView.setVisibility(View.VISIBLE);
                 audioLinearLayout.setVisibility(View.VISIBLE);
+                fileLinearLayout.setVisibility(View.GONE);
+                fileImageView.setVisibility(View.GONE);
                 messageTimeTextView.setText(msGmessage.getTime());
                 audioNameTextView.setText(msGmessage.getAudioName());
 //                if (!msGmessage.isAudioPlaying()){
@@ -268,12 +282,12 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
 
                 messageTextView.setVisibility(View.GONE);
                 photoImageView.setVisibility(View.GONE);
-                audioImageView.setVisibility(View.VISIBLE);
-                audioLinearLayout.setVisibility(View.VISIBLE);
+                audioImageView.setVisibility(View.GONE);
+                audioLinearLayout.setVisibility(View.GONE);
+                fileImageView.setVisibility(View.VISIBLE);
+                fileLinearLayout.setVisibility(View.VISIBLE);
                 messageTimeTextView.setText(msGmessage.getTime());
-                audioNameTextView.setText(msGmessage.getFileName());
-                audioImageView.setImageResource(R.drawable.ic_baseline_insert_drive_file_24_black);
-                audioImageView.setBackgroundColor(Color.TRANSPARENT);
+                fileNameTextView.setText(msGmessage.getFileName());
             }
             if (selectedList.contains(msGmessage)){
 
@@ -322,6 +336,19 @@ public class MSGAdapter extends ArrayAdapter<MSGmessage> {
                 }
             });
             audioImageView.setOnLongClickListener(v -> {
+                ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
+                selectItem(msGmessage);
+                return true;
+            });
+            fileImageView.setOnClickListener(v -> {
+                if (multiSelect){
+                    selectItem(msGmessage);
+                } else {
+                    int position = getPosition(msGmessage);
+                    listener.onUserClick(position);
+                }
+            });
+            fileImageView.setOnLongClickListener(v -> {
                 ((AppCompatActivity)v.getContext()).startSupportActionMode(actionModeCallbacks);
                 selectItem(msGmessage);
                 return true;

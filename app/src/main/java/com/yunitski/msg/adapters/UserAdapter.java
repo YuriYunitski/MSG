@@ -42,6 +42,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     private boolean video;
     private boolean photo;
     private boolean audio;
+    private boolean file;
 
     private int position;
     public int getPos(){
@@ -120,6 +121,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         video = false;
         photo = false;
         audio = false;
+        file = false;
         FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
         reference.addValueEventListener(new ValueEventListener() {
@@ -139,6 +141,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                         photo = message.getImageUrl() != null;
                         video = message.getVideoUrl() != null;
                         audio = message.getAudioUrl() != null;
+                        file = message.getFileUrl() != null;
                     }
                 }
                 if ("default".equals(lastMess)) {
@@ -156,6 +159,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 } else if (audio){
                     lastMsg.setText("Аудио");
                     lastMsg.setTextColor(Color.BLUE);
+                } else if (file){
+                    lastMsg.setText("Файл");
+                    lastMsg.setTextColor(Color.BLUE);
                 }
                 if (!showIcon && isMy){
                     imageView.setVisibility(View.VISIBLE);
@@ -170,6 +176,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
                 photo = false;
                 video = false;
                 audio = false;
+                file = false;
             }
 
             @Override

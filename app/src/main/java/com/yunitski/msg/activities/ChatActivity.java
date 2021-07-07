@@ -11,29 +11,21 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.OpenableColumns;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,20 +36,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -67,14 +56,7 @@ import com.yunitski.msg.adapters.MSGAdapter;
 import com.yunitski.msg.data.MSGmessage;
 import com.yunitski.msg.data.User;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -88,7 +70,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private ListView messageListView;
     private MSGAdapter adapter;
-    private ImageButton sendMessageImageButton, addContentImageButton;
+    private ImageButton sendMessageImageButton;
     private EditText messageEditText;
     private String userName;
     FirebaseDatabase database;
@@ -100,13 +82,10 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RC_VIDEO_PICKER = 128;
     private static final int RC_FILE_PICKER = 1283;
     private static final int RC_AUDIO_PICKER = 109;
-    private FirebaseStorage storage;
     private StorageReference chatImagesStorageReference;
     private StorageReference chatVideosStorageReference;
     private StorageReference chatAudioStorageReference;
     private StorageReference chatFileStorageReference;
-
-    private Toolbar toolbar;
 
     private String recipientUserId;
 
@@ -122,7 +101,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     FloatingActionButton floatingActionButton;
     private TextView userTitleTextView;
     private ImageView profilePhotoImageView;
-    private LinearLayout titleLinearLayout;
 
     ArrayList<String> urisList;
     ArrayList<String> videoUrisList;
@@ -135,11 +113,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     private MediaPlayer mediaPlayer;
     private boolean isPlay;
-    String nameD;
-    private ProgressDialog pDialog;
-    private static final int progress_bar_type = 0;
-    private boolean downloaded;
-    private boolean act;
     public final static String ACTIVITY_INFO_FILE = "activityFile";
     public final static String ACTIVITY_KEY = "activityKey";
 
@@ -147,15 +120,15 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        toolbar = findViewById(R.id.toolBar);
+        Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
 
         auth = FirebaseAuth.getInstance();
 
         database = FirebaseDatabase.getInstance();
-        storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
 
         messagesDatabaseReference = database.getReference().child("messages");
         usersDatabaseReference = database.getReference().child("users");
@@ -182,18 +155,16 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         audioNameList = new ArrayList<>();
         audioLocList = new ArrayList<>();
         msGmessageArrayList = new ArrayList<>();
-
-        downloaded = false;
         messageListView = findViewById(R.id.mainActivityListView);
         sendMessageImageButton = findViewById(R.id.sendMessageImageButton);
-        addContentImageButton = findViewById(R.id.addContentImageButton);
+        ImageButton addContentImageButton = findViewById(R.id.addContentImageButton);
         messageEditText = findViewById(R.id.messageEditText);
         chatItemLinearLayout = findViewById(R.id.chatItemLinearLayout);
         floatingActionButton = findViewById(R.id.fabBottom);
         floatingActionButton.setOnClickListener(this);
         userTitleTextView = findViewById(R.id.userTitleTextView);
         profilePhotoImageView = findViewById(R.id.profilePhotoImageView);
-        titleLinearLayout = findViewById(R.id.titleLinearLayout);
+        LinearLayout titleLinearLayout = findViewById(R.id.titleLinearLayout);
         titleLinearLayout.setOnClickListener(this);
 
         gmessages = new ArrayList<>();
@@ -212,33 +183,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 Intent intent1 = new Intent(ChatActivity.this, VideoActivity.class);
                 intent1.putExtra("videoUrl", msGmessageArrayList.get(position).getVideoUrl());
                 startActivity(intent1);
+            } else if (msGmessageArrayList.get(position).getFileUrl() != null){
+                Intent intent13 = new Intent(Intent.ACTION_VIEW);
+                intent13.setDataAndType(Uri.parse(msGmessageArrayList.get(position).getFileUrl()), "application/*");
+                intent13.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivity(intent13);
             }
         });
         adapter.setOnAudioClickListener((position, view) -> {
-//                if (msGmessageArrayList.get(position).getAudioLocation() == null || msGmessageArrayList.get(position).getAudioLocation().equals("")){
-//                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-//                            new DownloadFileFromURL(msGmessageArrayList.get(position).getAudioName(), position).execute(msGmessageArrayList.get(position).getAudioUrl());
-//                            DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
-//                            reference.addValueEventListener(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-//                                        MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-//                                        if (message.getRecipient().equals(auth.getCurrentUser().getUid()) && message.getSender().equals(recipientUserId)
-//                                        || message.getSender().equals(auth.getCurrentUser().getUid()) && message.getRecipient().equals(recipientUserId)){
-//                                            msGmessageArrayList.get(position).setAudioLocation(message.getAudioLocation());
-//                                        }
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                }
-//                            });
-//                        }
-//                    }
-//                    if (msGmessageArrayList.get(position).getAudioLocation() != null || downloaded){
                             if (!isPlay){
                                 mediaPlayer = new MediaPlayer();
                                 try {
@@ -248,10 +200,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-
-                                //mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioUrl()));
-//                                mediaPlayer = MediaPlayer.create(ChatActivity.this, Uri.parse(msGmessageArrayList.get(position).getAudioLocation()));
-
                                 view.setImageResource(R.drawable.ic_baseline_pause_24);
                                 isPlay = true;
                             } else {
@@ -259,7 +207,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                                 view.setImageResource(R.drawable.ic_baseline_play_arrow_24);
                                 isPlay = false;
                             }
-//                    }
         });
 
         messageEditText.addTextChangedListener(new TextWatcher() {
@@ -285,7 +232,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 User user = snapshot.getValue(User.class);
-                if (user.getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                assert user != null;
+                if (user.getId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())){
                     userName = user.getName();
                     Picasso.get().load(recipientUserAvatar).into(profilePhotoImageView);
                     userTitleTextView.setText(recipientUserName);
@@ -319,7 +267,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 MSGmessage message = snapshot.getValue(MSGmessage.class);
-                if (message.getSender().equals(auth.getCurrentUser().getUid())
+                assert message != null;
+                if (message.getSender().equals(Objects.requireNonNull(auth.getCurrentUser()).getUid())
                         && message.getRecipient().equals(recipientUserId)) {
                     message.setMine(true);
                     message.setName(userName);
@@ -436,29 +385,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         });
-        //registerForContextMenu(messageListView);
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("messages");
-        reference.addValueEventListener(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    MSGmessage message = dataSnapshot.getValue(MSGmessage.class);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        act = ss.getBoolean("isActive", false);
     }
 
     @Override
@@ -507,7 +433,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             MSGmessage gmessage = new MSGmessage();
             gmessage.setText(messageEditText.getText().toString());
             gmessage.setName(userName);
-            gmessage.setSender(auth.getCurrentUser().getUid());
+            gmessage.setSender(Objects.requireNonNull(auth.getCurrentUser()).getUid());
             gmessage.setRecipient(recipientUserId);
             gmessage.setImageUrl(null);
             gmessage.setTime(currentDate());
@@ -529,65 +455,50 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
             ImageButton video = view.findViewById(R.id.videoImageButton);
             ImageButton file = view.findViewById(R.id.fileImageButton);
             ImageButton audio = view.findViewById(R.id.audioImageButton);
-            photo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*"});
-                    startActivityForResult(intent, RC_IMAGE_PICKER);
+            photo.setOnClickListener(v1 -> {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"image/*"});
+                startActivityForResult(intent, RC_IMAGE_PICKER);
 
-                }
             });
-            video.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            video.setOnClickListener(v12 -> {
 
 //                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 //                    intent.addCategory(Intent.CATEGORY_OPENABLE);
 //                    intent.setType("video/*");
 //                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"video/*"});
 
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("video/*");
-                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                    startActivityForResult(intent, RC_VIDEO_PICKER);
-                }
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("video/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(intent, RC_VIDEO_PICKER);
             });
-            file.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            file.setOnClickListener(v13 -> {
 
-                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                    intent.addCategory(Intent.CATEGORY_OPENABLE);
-                    intent.setType("application/*");
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"application/*"});
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"application/*"});
 //                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 //                    intent.setType("application/*");
 //                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                    startActivityForResult(intent, RC_FILE_PICKER);
-                }
+                startActivityForResult(intent, RC_FILE_PICKER);
             });
-            audio.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            audio.setOnClickListener(v14 -> {
 
 //                    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 //                    intent.addCategory(Intent.CATEGORY_OPENABLE);
 //                    intent.setType("audio/*");
 //                    intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[] {"audio/*"});
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("audio/*");
-                    intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                    startActivityForResult(intent, RC_AUDIO_PICKER);
-                }
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("audio/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(intent, RC_AUDIO_PICKER);
             });
-            builder.setNegativeButton("отмена", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+            builder.setNegativeButton("отмена", (dialog, which) -> {
 
-                }
             });
             dialog = builder.create();
             dialog.show();
@@ -610,6 +521,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
+            assert data != null;
             Uri selectedImageUri = data.getData();
             final StorageReference imageReference = chatImagesStorageReference.child(selectedImageUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedImageUri);
@@ -620,7 +532,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw Objects.requireNonNull(task.getException());
                     }
                     // Continue with the task to get the download URL
                     return imageReference.getDownloadUrl();
@@ -631,12 +543,13 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
+                        assert downloadUri != null;
                         gmessage.setImageUrl(downloadUri.toString());
                         gmessage.setVideoUrl(null);
                         gmessage.setAudioUrl(null);
                         gmessage.setFileUrl(null);
                         gmessage.setName(userName);
-                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setSender(Objects.requireNonNull(auth.getCurrentUser()).getUid());
                         gmessage.setRecipient(recipientUserId);
                         gmessage.setTime(currentDate());
 
@@ -644,14 +557,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         messageListView.setSelection(adapter.getCount() - 1);
                         MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
                         mp.start();
-                    } else {
-                        // Handle failures
-                        // ...
-                    }
+                    }  // Handle failures
+                    // ...
+
                 }
             });
             dialog.dismiss();
         } else if (requestCode == RC_VIDEO_PICKER && resultCode == RESULT_OK){
+            assert data != null;
             Uri selectedVideoUri = data.getData();
             final StorageReference imageReference = chatVideosStorageReference.child(selectedVideoUri.getLastPathSegment());
             UploadTask uploadTask = imageReference.putFile(selectedVideoUri);
@@ -662,7 +575,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw Objects.requireNonNull(task.getException());
                     }
                     // Continue with the task to get the download URL
                     return imageReference.getDownloadUrl();
@@ -673,26 +586,27 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
+                        assert downloadUri != null;
                         gmessage.setVideoUrl(downloadUri.toString());
                         gmessage.setImageUrl(null);
                         gmessage.setAudioUrl(null);
                         gmessage.setFileUrl(null);
                         gmessage.setName(userName);
-                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setSender(Objects.requireNonNull(auth.getCurrentUser()).getUid());
                         gmessage.setRecipient(recipientUserId);
                         gmessage.setTime(currentDate());
                         messagesDatabaseReference.push().setValue(gmessage);
                         messageListView.setSelection(adapter.getCount() - 1);
                         MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
                         mp.start();
-                    } else {
-                        // Handle failures
-                        // ...
-                    }
+                    }  // Handle failures
+                    // ...
+
                 }
             });
             dialog.dismiss();
         }  else if (requestCode == RC_AUDIO_PICKER && resultCode == RESULT_OK){
+            assert data != null;
             Uri selectedAudioUri = data.getData();
             String name = queryName(getContentResolver(), selectedAudioUri);
             final StorageReference imageReference = chatAudioStorageReference.child(selectedAudioUri.getLastPathSegment());
@@ -704,7 +618,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw Objects.requireNonNull(task.getException());
                     }
                     // Continue with the task to get the download URL
                     return imageReference.getDownloadUrl();
@@ -715,13 +629,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
+                        assert downloadUri != null;
                         gmessage.setAudioUrl(downloadUri.toString());
                         gmessage.setAudioName(name);
                         gmessage.setFileUrl(null);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
-                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setSender(Objects.requireNonNull(auth.getCurrentUser()).getUid());
                         gmessage.setRecipient(recipientUserId);
                         gmessage.setTime(currentDate());
                         messagesDatabaseReference.push().setValue(gmessage);
@@ -729,14 +644,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
                         mp.start();
 //                        Toast.makeText(getApplicationContext(), "" + queryName(getContentResolver(), selectedAudioUri), Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Handle failures
-                        // ...
-                    }
+                    }  // Handle failures
+                    // ...
+
                 }
             });
             dialog.dismiss();
         }  else if (requestCode == RC_FILE_PICKER && resultCode == RESULT_OK){
+            assert data != null;
             Uri selectedFileUri = data.getData();
             String name = queryName(getContentResolver(), selectedFileUri);
             final StorageReference imageReference = chatFileStorageReference.child(selectedFileUri.getLastPathSegment());
@@ -748,7 +663,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
                     if (!task.isSuccessful()) {
-                        throw task.getException();
+                        throw Objects.requireNonNull(task.getException());
                     }
                     // Continue with the task to get the download URL
                     return imageReference.getDownloadUrl();
@@ -759,13 +674,14 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         MSGmessage gmessage = new MSGmessage();
+                        assert downloadUri != null;
                         gmessage.setFileUrl(downloadUri.toString());
                         gmessage.setFileName(name);
                         gmessage.setAudioUrl(null);
                         gmessage.setVideoUrl(null);
                         gmessage.setImageUrl(null);
                         gmessage.setName(userName);
-                        gmessage.setSender(auth.getCurrentUser().getUid());
+                        gmessage.setSender(Objects.requireNonNull(auth.getCurrentUser()).getUid());
                         gmessage.setRecipient(recipientUserId);
                         gmessage.setTime(currentDate());
                         messagesDatabaseReference.push().setValue(gmessage);
@@ -773,10 +689,9 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
                         MediaPlayer mp = MediaPlayer.create(ChatActivity.this, R.raw.intuition_561);
                         mp.start();
 //                        Toast.makeText(getApplicationContext(), "" + queryName(getContentResolver(), selectedAudioUri), Toast.LENGTH_SHORT).show();
-                    } else {
-                        // Handle failures
-                        // ...
-                    }
+                    }  // Handle failures
+                    // ...
+
                 }
             });
             dialog.dismiss();
@@ -798,10 +713,8 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case android.R.id.home:
-                this.finish();
-                break;
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
         }
         return true;
     }
@@ -832,116 +745,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public static void cancelNotification(Context ctx, int notifyId) {
-        String ns = Context.NOTIFICATION_SERVICE;
-        NotificationManager nMgr = (NotificationManager) ctx.getSystemService(ns);
+        NotificationManager nMgr = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
         nMgr.cancel(notifyId);
-    }
-
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        switch (id) {
-            case progress_bar_type: // we set this to 0
-                pDialog = new ProgressDialog(this);
-                pDialog.setMessage("Downloading file. Please wait...");
-                pDialog.setIndeterminate(false);
-                pDialog.setMax(100);
-                pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pDialog.setCancelable(true);
-                pDialog.show();
-                return pDialog;
-            default:
-                return null;
-        }
-    }
-
-    class DownloadFileFromURL extends AsyncTask<String, String, String>{
-
-        private String name;
-
-        private int position;
-
-
-        public DownloadFileFromURL(String name, int position){
-            this.name = name;
-            this.position = position;
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showDialog(progress_bar_type);
-        }
-
-        @Override
-        protected String doInBackground(String... f_url) {
-            int count;
-            File filesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS + "/MSGaudio");
-            if (!filesDir.exists()){
-                filesDir.mkdirs();
-            }
-            String fileName = name + ".mp3";
-            File file = new File(filesDir, fileName);
-            try {
-                if (!file.exists()) {
-                    if (!file.createNewFile()) {
-                        throw new IOException("Cant able to create file");
-                    }
-                }
-                URL url = new URL(f_url[0]);
-                URLConnection connection = url.openConnection();
-                connection.connect();
-
-                // this will be useful so that you can show a tipical 0-100%
-                // progress bar
-                int lenghtOfFile = connection.getContentLength();
-
-                // download the file
-                InputStream input = new BufferedInputStream(url.openStream());
-
-                // Output stream
-
-                OutputStream output = new FileOutputStream(file);
-                nameD = file.toString();
-                FirebaseDatabase  database = FirebaseDatabase.getInstance();
-                DatabaseReference mDatabaseRef = database.getReference();
-                mDatabaseRef.child("messages").child(msGmessageArrayList.get(position).getPusId()).child("audioLocation").setValue(file.toString());
-
-                downloaded = true;
-                byte data[] = f_url[0].getBytes();
-
-                long total = 0;
-
-                while ((count = input.read(data)) != -1) {
-                    total += count;
-                    // publishing the progress....
-                    // After this onProgressUpdate will be called
-                    publishProgress("" + (int) ((total * 100) / lenghtOfFile));
-
-                    // writing data to file
-                    output.write(data, 0, count);
-                }
-
-                // flushing output
-                output.flush();
-
-                // closing streams
-                output.close();
-                input.close();
-
-            } catch (Exception e) {
-                Log.e("Error: ", e.getMessage());
-            }
-
-            return null;
-        }
-        protected void onProgressUpdate(String... progress) {
-            // setting progress percentage
-            pDialog.setProgress(Integer.parseInt(progress[0]));
-        }
-        @Override
-        protected void onPostExecute(String file_url) {
-            // dismiss the dialog after the file was downloaded
-            dismissDialog(progress_bar_type);
-
-        }
     }
 }

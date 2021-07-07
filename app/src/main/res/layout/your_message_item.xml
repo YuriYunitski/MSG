@@ -43,6 +43,28 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/fileLinearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/fileImageView"
+                android:src="@drawable/ic_baseline_insert_drive_file_24_black"/>
+
+            <TextView
+                android:id="@+id/fileNameTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="oi"
+                android:paddingStart="5dp"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
 
 
         <TextView
