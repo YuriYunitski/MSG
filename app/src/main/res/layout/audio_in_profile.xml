@@ -18,19 +18,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/back_gray">
+        android:padding="6dp"
+        android:background="@drawable/audio_profile_bckgr">
 
         <ImageView
             android:id="@+id/audioImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_play_arrow_24" />
+            android:src="@drawable/ic_baseline_play_arrow_24"
+            android:background="@drawable/circle_audio"/>
 
         <TextView
             android:id="@+id/audioNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/black"
             android:text="TextView" />
 
 

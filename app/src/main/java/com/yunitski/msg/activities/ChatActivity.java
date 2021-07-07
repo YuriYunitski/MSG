@@ -82,10 +82,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private static final int RC_VIDEO_PICKER = 128;
     private static final int RC_FILE_PICKER = 1283;
     private static final int RC_AUDIO_PICKER = 109;
-    private StorageReference chatImagesStorageReference;
-    private StorageReference chatVideosStorageReference;
-    private StorageReference chatAudioStorageReference;
-    private StorageReference chatFileStorageReference;
+    private StorageReference chatImagesStorageReference, chatVideosStorageReference, chatAudioStorageReference, chatFileStorageReference;
 
     private String recipientUserId;
 
@@ -102,12 +99,7 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
     private TextView userTitleTextView;
     private ImageView profilePhotoImageView;
 
-    ArrayList<String> urisList;
-    ArrayList<String> videoUrisList;
-    ArrayList<String> audioUrisList;
-    ArrayList<String> audioNameList;
-    ArrayList<String> fileUrisList;
-    ArrayList<String> fileNameList;
+    ArrayList<String> urisList, videoUrisList, audioUrisList, audioNameList, fileUrisList, fileNameList;
 
     AlertDialog.Builder builder;
     AlertDialog dialog;
@@ -416,7 +408,6 @@ public class ChatActivity extends AppCompatActivity implements View.OnClickListe
         SharedPreferences.Editor editor = ss.edit();
         editor.putBoolean(ACTIVITY_KEY, false);
         editor.apply();
-//        act = ss.getBoolean("isActive", false);
         if (mediaPlayer != null) {
             mediaPlayer.stop();
         }
