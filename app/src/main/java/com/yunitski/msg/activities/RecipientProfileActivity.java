@@ -86,13 +86,13 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         fileNameList = intent.getStringArrayListExtra("fileName");
         userNameRecipientProfileTextView.setText(intent.getStringExtra("recipientUserName"));
         Glide.with(recipientUserAvatar).load(intent.getStringExtra("recipientUserAvatar")).into(recipientUserAvatar);
-        photoTextView.setTextColor(Color.BLACK);
-//        videoTextView.setTextColor(Color.LTGRAY);
-//        fileTextView.setTextColor(Color.LTGRAY);
-//        audioTextView.setTextColor(Color.LTGRAY);
-        videoTextView.setTextColor(Color.WHITE);
-        fileTextView.setTextColor(Color.WHITE);
-        audioTextView.setTextColor(Color.WHITE);
+        photoTextView.setTextColor(Color.WHITE);
+        videoTextView.setTextColor(Color.LTGRAY);
+        fileTextView.setTextColor(Color.LTGRAY);
+        audioTextView.setTextColor(Color.LTGRAY);
+//        videoTextView.setTextColor(Color.WHITE);
+//        fileTextView.setTextColor(Color.WHITE);
+//        audioTextView.setTextColor(Color.WHITE);
         updateUI();
     }
 
@@ -102,13 +102,13 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
         if (v.getId() == R.id.recipientImageButton){
             RecipientProfileActivity.this.finish();
         } else if (v.getId() == R.id.photoTextView){
-            photoTextView.setTextColor(Color.BLACK);
-//            videoTextView.setTextColor(Color.LTGRAY);
-//            fileTextView.setTextColor(Color.LTGRAY);
-//            audioTextView.setTextColor(Color.LTGRAY);
-            videoTextView.setTextColor(Color.WHITE);
-            fileTextView.setTextColor(Color.WHITE);
-            audioTextView.setTextColor(Color.WHITE);
+            photoTextView.setTextColor(Color.WHITE);
+            videoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.LTGRAY);
+//            videoTextView.setTextColor(Color.WHITE);
+//            fileTextView.setTextColor(Color.WHITE);
+//            audioTextView.setTextColor(Color.WHITE);
             photo = true;
             video = false;
             file = false;
@@ -116,13 +116,13 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.videoTextView){
-            videoTextView.setTextColor(Color.BLACK);
-//            photoTextView.setTextColor(Color.LTGRAY);
-//            fileTextView.setTextColor(Color.LTGRAY);
-//            audioTextView.setTextColor(Color.LTGRAY);
-            photoTextView.setTextColor(Color.WHITE);
-            fileTextView.setTextColor(Color.WHITE);
-            audioTextView.setTextColor(Color.WHITE);
+            videoTextView.setTextColor(Color.WHITE);
+            photoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.LTGRAY);
+//            photoTextView.setTextColor(Color.WHITE);
+//            fileTextView.setTextColor(Color.WHITE);
+//            audioTextView.setTextColor(Color.WHITE);
             photo = false;
             video = true;
             file = false;
@@ -130,13 +130,13 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.fileTextView){
-            fileTextView.setTextColor(Color.BLACK);
-//            photoTextView.setTextColor(Color.LTGRAY);
-//            videoTextView.setTextColor(Color.LTGRAY);
-//            audioTextView.setTextColor(Color.LTGRAY);
-            photoTextView.setTextColor(Color.WHITE);
-            videoTextView.setTextColor(Color.WHITE);
-            audioTextView.setTextColor(Color.WHITE);
+            fileTextView.setTextColor(Color.WHITE);
+            photoTextView.setTextColor(Color.LTGRAY);
+            videoTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.LTGRAY);
+//            photoTextView.setTextColor(Color.WHITE);
+//            videoTextView.setTextColor(Color.WHITE);
+//            audioTextView.setTextColor(Color.WHITE);
             photo = false;
             video = false;
             file = true;
@@ -144,13 +144,13 @@ public class RecipientProfileActivity extends AppCompatActivity implements View.
             isPlay = false;
             updateUI();
         } else if (v.getId() == R.id.audioTextView){
-//            photoTextView.setTextColor(Color.LTGRAY);
-//            videoTextView.setTextColor(Color.LTGRAY);
-//            fileTextView.setTextColor(Color.LTGRAY);
-            audioTextView.setTextColor(Color.BLACK);
-            photoTextView.setTextColor(Color.WHITE);
-            videoTextView.setTextColor(Color.WHITE);
-            fileTextView.setTextColor(Color.WHITE);
+            photoTextView.setTextColor(Color.LTGRAY);
+            videoTextView.setTextColor(Color.LTGRAY);
+            fileTextView.setTextColor(Color.LTGRAY);
+            audioTextView.setTextColor(Color.WHITE);
+//            photoTextView.setTextColor(Color.WHITE);
+//            videoTextView.setTextColor(Color.WHITE);
+//            fileTextView.setTextColor(Color.WHITE);
             photo = false;
             video = false;
             file = false;

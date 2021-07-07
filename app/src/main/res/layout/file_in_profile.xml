@@ -8,6 +8,7 @@
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
     android:orientation="vertical"
+    android:background="@drawable/back_gray"
     android:layout_height="wrap_content">
 
 
@@ -15,13 +16,10 @@
         android:id="@+id/fileLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/back_gray">
+        android:orientation="horizontal">
 
         <ImageView
+            android:padding="6dp"
             android:id="@+id/fileImageView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +35,16 @@
             android:textColor="@color/black"
             android:text="TextView" />
 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/black" />
+        </LinearLayout>
 
     </LinearLayout>
     <View
